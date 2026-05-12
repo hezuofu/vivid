@@ -7,6 +7,12 @@ package org.vividframework.beans;
 public interface BeanPostProcessor {
 
     /**
+     * Set the bean factory (called by container)
+     */
+    default void setBeanFactory(BeanFactory beanFactory) {
+    }
+
+    /**
      * Post-process before initialization
      */
     default Object postProcessBeforeInitialization(Object bean, String beanName) throws Exception {

@@ -1,26 +1,38 @@
 package org.vividframework.context;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.vividframework.beans.BeanDefinition;
 import org.vividframework.beans.BeanDefinitionRegistry;
+import org.vividframework.beans.BeanPostProcessor;
 import org.vividframework.beans.DefaultListableBeanFactory;
+import org.vividframework.beans.RootBeanDefinition;
+import org.vividframework.beans.annotation.Component;
+import org.vividframework.beans.annotation.ComponentScan;
+import org.vividframework.beans.config.AutowiredAnnotationBeanPostProcessor;
+import org.vividframework.beans.scanner.ClassPathBeanDefinitionScanner;
 import org.vividframework.config.Environment;
 
+import java.lang.annotation.Annotation;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
 /**
- * Generic application context implementation
+ * Generic application context implementation with full refresh lifecycle.
  * @author Jon Fisher
  */
 public class GenericApplicationContext implements ApplicationContext, BeanDefinitionRegistry {
 
+    private static final Logger logger = LoggerFactory.getLogger(GenericApplicationContext.class);
+
     private final DefaultListableBeanFactory beanFactory;
     private final String id;
-    private final String displayName;
+    private String displayName;
     private ApplicationContext parent;
     private Environment environment;
     private final AtomicBoolean active = new AtomicBoolean(false);
     private final AtomicBoolean closed = new AtomicBoolean(false);
+    private boolean refreshed = false;
 
     public GenericApplicationContext() {
         this(new DefaultListableBeanFactory());
@@ -30,12 +42,22 @@ public class GenericApplicationContext implements ApplicationContext, BeanDefini
         this.beanFactory = beanFactory;
         this.id = generateId();
         this.displayName = "GenericApplicationContext";
+        // Register default bean post processors
+        registerDefaultBeanPostProcessors();
     }
 
     public GenericApplicationContext(String id) {
         this.beanFactory = new DefaultListableBeanFactory();
         this.id = id;
         this.displayName = "GenericApplicationContext";
+        registerDefaultBeanPostProcessors();
+    }
+
+    private void registerDefaultBeanPostProcessors() {
+        // Register AutowiredAnnotationBeanPostProcessor
+        AutowiredAnnotationBeanPostProcessor processor = new AutowiredAnnotationBeanPostProcessor();
+        processor.setBeanFactory(beanFactory);
+        beanFactory.addBeanPostProcessor(processor);
     }
 
     private String generateId() {
@@ -53,7 +75,7 @@ public class GenericApplicationContext implements ApplicationContext, BeanDefini
     }
 
     public void setDisplayName(String displayName) {
-        this.beanFactory.getClass(); // Ensure beanFactory exists
+        this.displayName = displayName;
     }
 
     @Override
@@ -99,8 +121,20 @@ public class GenericApplicationContext implements ApplicationContext, BeanDefini
 
     @Override
     public void close() {
+        if (closed.get()) {
+            return;
+        }
         closed.set(true);
         active.set(false);
+        refreshed = false;
+        
+        // Destroy singleton beans
+        destroySingletons();
+    }
+
+    protected void destroySingletons() {
+        logger.debug("Destroying singletons in context '{}'", this);
+        // TODO: Implement singleton destruction with DisposableBean
     }
 
     @Override
@@ -202,47 +236,163 @@ public class GenericApplicationContext implements ApplicationContext, BeanDefini
         return beanFactory;
     }
 
+    /**
+     * Register a bean definition from component scanning
+     */
+    public void scan(String... basePackages) {
+        ClassPathBeanDefinitionScanner scanner = new ClassPathBeanDefinitionScanner(this);
+        scanner.scan(basePackages);
+    }
+
+    /**
+     * Register configuration class and scan its packages
+     */
+    public void register(Class<?>... configurationClasses) {
+        for (Class<?> configClass : configurationClasses) {
+            if (configClass.isAnnotationPresent(Component.class)) {
+                registerBeanDefinition(ClassPathBeanDefinitionScanner.getBeanName(configClass), 
+                        new RootBeanDefinition(configClass));
+            }
+            
+            // Scan from ComponentScan
+            if (configClass.isAnnotationPresent(ComponentScan.class)) {
+                ComponentScan componentScan = configClass.getAnnotation(ComponentScan.class);
+                ClassPathBeanDefinitionScanner scanner = new ClassPathBeanDefinitionScanner(this);
+                scanner.scanFromComponentScan(configClass);
+            }
+        }
+    }
+
+    /**
+     * Refresh the application context.
+     * This method performs the complete initialization sequence.
+     */
     public void refresh() throws Exception {
-        prepareRefresh();
-        // Configure bean factory
-        prepareBeanFactory(beanFactory);
-        // Post-process bean factory
-        postProcessBeanFactory(beanFactory);
-        // Invoke factory processors
-        invokeBeanFactoryProcessors(beanFactory);
-        // Register bean post-processors
-        registerBeanPostProcessors(beanFactory);
-        // Initialize bean factory
-        finishBeanFactoryInitialization(beanFactory);
-        // Finish refresh
-        finishRefresh();
+        if (refreshed) {
+            throw new IllegalStateException("GenericApplicationContext has already been refreshed");
+        }
+        if (closed.get()) {
+            throw new IllegalStateException("GenericApplicationContext has been closed");
+        }
+
+        try {
+            // Step 1: Prepare refresh
+            prepareRefresh();
+
+            // Step 2: Prepare the bean factory
+            prepareBeanFactory(beanFactory);
+
+            // Step 3: Post-process the bean factory (subclasses can override)
+            postProcessBeanFactory(beanFactory);
+
+            // Step 4: Invoke factory processors
+            invokeBeanFactoryProcessors(beanFactory);
+
+            // Step 5: Register bean post-processors
+            registerBeanPostProcessors(beanFactory);
+
+            // Step 6: Initialize the bean factory
+            initMessageSource(beanFactory);
+            initApplicationEventMulticaster(beanFactory);
+            onRefresh(beanFactory);
+
+            // Step 7: Check for listeners and publish events
+            registerListeners();
+
+            // Step 8: Instantiate singletons
+            finishBeanFactoryInitialization(beanFactory);
+
+            // Step 9: Finish refresh
+            finishRefresh();
+
+            refreshed = true;
+        } catch (Exception e) {
+            logger.error("Failed to refresh context", e);
+            destroyBeans();
+            throw e;
+        }
     }
 
     protected void prepareRefresh() {
         active.set(true);
+        closed.set(false);
+        logger.info("Starting refresh of GenericApplicationContext '{}'", this.id);
     }
 
     protected void prepareBeanFactory(DefaultListableBeanFactory beanFactory) {
-        // Configure bean factory
+        // Configure bean factory settings
+        beanFactory.setAllowCircularReferences(true);
+        logger.debug("Prepared bean factory with {} bean definitions", beanFactory.getBeanDefinitionCount());
     }
 
     protected void postProcessBeanFactory(DefaultListableBeanFactory beanFactory) {
-        // Post-process
+        // Subclasses can override to add post-processing
     }
 
     protected void invokeBeanFactoryProcessors(DefaultListableBeanFactory beanFactory) {
-        // Invoke processors
+        // Invoke BeanFactoryPostProcessor beans
+        // For now, skip - would need BeanFactoryPostProcessor interface
+        logger.debug("Invoked {} bean factory processors", 0);
     }
 
     protected void registerBeanPostProcessors(DefaultListableBeanFactory beanFactory) {
-        // Register post processors
+        // Ensure AutowiredAnnotationBeanPostProcessor is registered first
+        boolean hasAutowiredProcessor = false;
+        for (BeanPostProcessor bpp : beanFactory.getBeanPostProcessors()) {
+            if (bpp instanceof AutowiredAnnotationBeanPostProcessor) {
+                hasAutowiredProcessor = true;
+                break;
+            }
+        }
+        
+        if (!hasAutowiredProcessor) {
+            AutowiredAnnotationBeanPostProcessor processor = new AutowiredAnnotationBeanPostProcessor();
+            processor.setBeanFactory(beanFactory);
+            beanFactory.addBeanPostProcessor(processor);
+        }
+        
+        logger.debug("Registered {} bean post processors", beanFactory.getBeanPostProcessors().size());
+    }
+
+    protected void initMessageSource(DefaultListableBeanFactory beanFactory) {
+        // No-op: would need MessageSource interface
+    }
+
+    protected void initApplicationEventMulticaster(DefaultListableBeanFactory beanFactory) {
+        // No-op: would need ApplicationEventMulticaster
+    }
+
+    protected void onRefresh(DefaultListableBeanFactory beanFactory) throws Exception {
+        // Subclasses can override to create internal beans
+    }
+
+    protected void registerListeners() {
+        // No-op: would need ApplicationEvent infrastructure
     }
 
     protected void finishBeanFactoryInitialization(DefaultListableBeanFactory beanFactory) throws Exception {
-        // Initialize singleton beans
+        // Instantiate all singleton beans
+        String[] beanNames = beanFactory.getBeanDefinitionNames();
+        for (String beanName : beanNames) {
+            RootBeanDefinition bd = beanFactory.getBeanDefinition(beanName);
+            if (!bd.isAbstract() && bd.isSingleton() && !bd.hasPropertyValues()) {
+                try {
+                    beanFactory.getBean(beanName);
+                } catch (Exception e) {
+                    logger.debug("Failed to pre-instantiate bean '{}': {}", beanName, e.getMessage());
+                }
+            }
+        }
+        logger.info("Finished bean factory initialization with {} singletons", beanFactory.getBeanDefinitionCount());
     }
 
     protected void finishRefresh() {
         start();
+        logger.info("Completed refresh of GenericApplicationContext '{}'", this.id);
+    }
+
+    protected void destroyBeans() {
+        beanFactory.clearSingletonCache();
+        refreshed = false;
     }
 }

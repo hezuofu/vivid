@@ -184,8 +184,10 @@ public interface Advised {
     }
 
     /**
-     * CGLIB proxy implementation (simplified)
+     * CGLIB proxy implementation - moved to CglibAopProxy.java
+     * This class is kept for backward compatibility but delegates to the actual implementation
      */
+    @Deprecated
     class CglibAopProxy {
 
         private final AdvisedSupport advised;
@@ -195,8 +197,8 @@ public interface Advised {
         }
 
         public Object getProxy(ClassLoader classLoader) {
-            // Simplified CGLIB proxy - in production use actual CGLIB library
-            return advised.getTarget();
+            // Delegate to the actual CglibAopProxy implementation
+            return new org.vividframework.aop.CglibAopProxy(advised).getProxy(classLoader);
         }
     }
 

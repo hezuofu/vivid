@@ -2,12 +2,14 @@ package org.vividframework.boot;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.vividframework.context.GenericApplicationContext;
+import org.vividframework.beans.BeanDefinitionRegistry;
 import org.vividframework.beans.RootBeanDefinition;
 import org.vividframework.beans.annotation.Component;
+import org.vividframework.beans.annotation.ComponentScan;
+import org.vividframework.beans.scanner.ClassPathBeanDefinitionScanner;
+import org.vividframework.context.GenericApplicationContext;
 import org.vividframework.web.DispatcherHandler;
 import org.vividframework.web.RequestMappingHandlerMapping;
-import org.vividframework.web.annotation.RestController;
 import org.vividframework.http.server.NettyHttpServer;
 import org.vividframework.http.server.AbstractHttpServer;
 import org.vividframework.resolver.ViewResolver;
@@ -15,18 +17,11 @@ import org.vividframework.view.JsonView;
 import org.vividframework.view.RedirectView;
 import org.vividframework.event.ApplicationEventPublisher;
 import org.vividframework.config.Environment;
-import org.vividframework.config.PropertySource;
 
-import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Modifier;
-import java.net.URL;
 import java.util.*;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
 /**
- * Spring Application style runner
+ * Spring Application style runner with auto-configuration support.
  * @author Jon Fisher
  */
 public class SpringApplication {
@@ -35,17 +30,22 @@ public class SpringApplication {
 
     private final Class<?> primarySource;
     private Properties defaultProperties = new Properties();
-    private Set<String> sources = new LinkedHashSet<>();
-    private Set<String> configLocations = new LinkedHashSet<>();
     private boolean webEnvironment = true;
     private GenericApplicationContext applicationContext;
     private AbstractHttpServer webServer;
+    private String[] args;
 
     public SpringApplication(Class<?> primarySource) {
         this.primarySource = primarySource;
     }
 
+    public static void run(Class<?> primarySource, String... args) {
+        SpringApplication app = new SpringApplication(primarySource);
+        app.run(args);
+    }
+
     public GenericApplicationContext run(String... args) {
+        this.args = args;
         logger.info("Starting Vivid Application...");
 
         try {
@@ -83,16 +83,25 @@ public class SpringApplication {
 
     protected void configureEnvironment() {
         Environment env = applicationContext.getEnvironment();
-        if (env instanceof Environment.StandardEnvironment) {
-            ((Environment.StandardEnvironment) env).setProperty("server.port", "8080");
-            defaultProperties.forEach((key, value) ->
-                    ((Environment.StandardEnvironment) env).setProperty(key.toString(), value.toString()));
+        // Apply default properties
+        defaultProperties.forEach((key, value) -> {
+            if (env.getProperty(key.toString()) == null) {
+                env.setProperty(key.toString(), value.toString());
+            }
+        });
+        
+        // Set defaults
+        if (env.getProperty("server.port") == null) {
+            env.setProperty("server.port", "8080");
         }
     }
 
     protected void prepareContext(GenericApplicationContext context) {
         // Register web handler
         registerDispatcherHandler(context);
+
+        // Load auto-configurations
+        loadAutoConfigurations(context);
 
         // Scan and register beans
         scanAndRegisterBeans(context);
@@ -107,6 +116,51 @@ public class SpringApplication {
                 createBeanDefinition(ApplicationEventPublisher.SimpleApplicationEventPublisher.class, eventPublisher));
     }
 
+    protected void loadAutoConfigurations(GenericApplicationContext context) {
+        // Load auto-configuration classes
+        List<String> autoConfigClasses = loadFactoryNames();
+        
+        for (String className : autoConfigClasses) {
+            try {
+                Class<?> configClass = Class.forName(className);
+                if (configClass.isAnnotationPresent(Component.class) || 
+                    configClass.getName().endsWith("Configuration")) {
+                    Object instance = configClass.getDeclaredConstructor().newInstance();
+                    String beanName = ClassPathBeanDefinitionScanner.getBeanName(configClass);
+                    context.registerBeanDefinition(beanName, new RootBeanDefinition(configClass));
+                    logger.debug("Loaded auto-configuration: {}", className);
+                }
+            } catch (Exception e) {
+                logger.debug("Could not load auto-configuration class: {}", className);
+            }
+        }
+    }
+
+    protected List<String> loadFactoryNames() {
+        List<String> names = new ArrayList<>();
+        try {
+            Enumeration<java.net.URL> urls = Thread.currentThread().getContextClassLoader()
+                    .getResources("META-INF/vivid.factories");
+            while (urls.hasMoreElements()) {
+                java.net.URL url = urls.nextElement();
+                java.io.InputStream is = url.openStream();
+                java.util.Properties props = new java.util.Properties();
+                props.load(is);
+                is.close();
+                
+                String value = props.getProperty("org.vividframework.boot.autoconfigure.EnableAutoConfiguration");
+                if (value != null) {
+                    for (String name : value.split(",")) {
+                        names.add(name.trim());
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.debug("No auto-configurations found");
+        }
+        return names;
+    }
+
     protected void registerDispatcherHandler(GenericApplicationContext context) {
         DispatcherHandler dispatcherHandler = new DispatcherHandler(context);
         context.registerBeanDefinition("dispatcherHandler",
@@ -114,20 +168,43 @@ public class SpringApplication {
     }
 
     protected void scanAndRegisterBeans(GenericApplicationContext context) {
-        String basePackage = getBasePackage(primarySource);
-        Set<Class<?>> componentClasses = scanComponents(basePackage);
-
-        for (Class<?> clazz : componentClasses) {
-            try {
-                Object instance = clazz.getDeclaredConstructor().newInstance();
-                String beanName = getBeanName(clazz);
-                context.registerBeanDefinition(beanName,
-                        createBeanDefinition(clazz, instance));
-                logger.debug("Registered component: {} as {}", clazz.getName(), beanName);
-            } catch (Exception e) {
-                logger.warn("Failed to register component: " + clazz.getName(), e);
-            }
+        // Check for @ComponentScan on primary source
+        ComponentScan componentScan = primarySource.getAnnotation(ComponentScan.class);
+        String[] basePackages;
+        
+        if (componentScan != null) {
+            basePackages = getComponentScanPackages(componentScan);
+        } else {
+            // Default to the package of the primary source
+            basePackages = new String[]{getBasePackage(primarySource)};
         }
+
+        // Use ClassPathBeanDefinitionScanner
+        ClassPathBeanDefinitionScanner scanner = new ClassPathBeanDefinitionScanner(context);
+        scanner.scan(basePackages);
+        
+        logger.info("Scanned {} packages: {}", basePackages.length, Arrays.toString(basePackages));
+    }
+
+    protected String[] getComponentScanPackages(ComponentScan componentScan) {
+        List<String> packages = new ArrayList<>();
+        
+        // From value
+        packages.addAll(Arrays.asList(componentScan.value()));
+        
+        // From basePackages
+        packages.addAll(Arrays.asList(componentScan.basePackages()));
+        
+        // From basePackageClasses
+        for (Class<?> cls : componentScan.basePackageClasses()) {
+            packages.add(cls.getPackage().getName());
+        }
+        
+        if (packages.isEmpty()) {
+            packages.add(getBasePackage(primarySource));
+        }
+        
+        return packages.toArray(new String[0]);
     }
 
     protected void registerWebComponents(GenericApplicationContext context) {
@@ -138,7 +215,7 @@ public class SpringApplication {
 
         // Register view resolvers
         ViewResolver jsonViewResolver = viewName -> {
-            if (viewName.startsWith("json:")) {
+            if (viewName != null && viewName.startsWith("json:")) {
                 return new JsonView();
             }
             return null;
@@ -147,7 +224,7 @@ public class SpringApplication {
                 createBeanDefinition(ViewResolver.class, jsonViewResolver));
 
         ViewResolver redirectViewResolver = viewName -> {
-            if (viewName.startsWith("redirect:")) {
+            if (viewName != null && viewName.startsWith("redirect:")) {
                 return new RedirectView(viewName.substring(9));
             }
             return null;
@@ -156,50 +233,8 @@ public class SpringApplication {
                 createBeanDefinition(ViewResolver.class, redirectViewResolver));
     }
 
-    protected Set<Class<?>> scanComponents(String basePackage) {
-        Set<Class<?>> components = new HashSet<>();
-        String packagePath = basePackage.replace('.', '/');
-
-        try {
-            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-            Enumeration<URL> resources = classLoader.getResources(packagePath);
-
-            while (resources.hasMoreElements()) {
-                URL resource = resources.nextElement();
-                String protocol = resource.getProtocol();
-
-                if ("file".equals(protocol)) {
-                    scanPackageFromFile(resource, basePackage, components);
-                } else if ("jar".equals(protocol)) {
-                    scanPackageFromJar(resource, basePackage, components);
-                }
-            }
-        } catch (IOException e) {
-            logger.warn("Error scanning package: " + basePackage, e);
-        }
-
-        return components;
-    }
-
-    private void scanPackageFromFile(URL resource, String basePackage, Set<Class<?>> components) {
-        // Simplified - in production use ASM or Java compiler
-    }
-
-    private void scanPackageFromJar(URL resource, String basePackage, Set<Class<?>> components) {
-        // Simplified - in production use JarInputStream
-    }
-
     protected String getBasePackage(Class<?> clazz) {
-        Component component = clazz.getAnnotation(Component.class);
-        if (component != null && !component.value().isEmpty()) {
-            return component.value();
-        }
         return clazz.getPackage().getName();
-    }
-
-    protected String getBeanName(Class<?> clazz) {
-        String name = clazz.getSimpleName();
-        return Character.toLowerCase(name.charAt(0)) + name.substring(1);
     }
 
     protected RootBeanDefinition createBeanDefinition(Class<?> type, Object instance) {

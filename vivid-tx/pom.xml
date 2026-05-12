@@ -29,5 +29,9 @@
             <groupId>org.vividframework</groupId>
             <artifactId>vivid-core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.vividframework</groupId>
+            <artifactId>vivid-aop</artifactId>
+        </dependency>
     </dependencies>
 </project>

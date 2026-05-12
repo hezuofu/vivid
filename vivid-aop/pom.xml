@@ -25,5 +25,9 @@
             <groupId>org.vividframework</groupId>
             <artifactId>vivid-core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>cglib</artifactId>
+        </dependency>
     </dependencies>
 </project>

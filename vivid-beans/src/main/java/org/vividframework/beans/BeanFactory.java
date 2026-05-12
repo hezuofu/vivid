@@ -47,4 +47,9 @@ public interface BeanFactory {
      * Get bean type
      */
     Class<?> getType(String name) throws Exception;
+
+    /**
+     * Get bean names for type
+     */
+    String[] getBeanNamesForType(Class<?> type);
 }
