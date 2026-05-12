@@ -27,5 +27,8 @@ buildNumber.properties
 .DS_Store
 Thumbs.db
 
-# Logs
+# Build Logs
 *.log
+compile_*.txt
+*.tmp
+*.bak
