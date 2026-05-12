@@ -102,12 +102,12 @@ public class AutowiredAnnotationBeanPostProcessor implements BeanPostProcessor {
         }
         metadata.fields = autowiredFields.toArray(new Field[0]);
         
-        // Find autowired methods (excluding constructors)
+        // Find autowired methods
         List<Method> autowiredMethods = new ArrayList<>();
         current = clazz;
         while (current != null && current != Object.class) {
             for (Method method : current.getDeclaredMethods()) {
-                if (!method.isConstructor() && isAutowiredMethod(method)) {
+                if (isAutowiredMethod(method)) {
                     autowiredMethods.add(method);
                 }
             }

@@ -25,7 +25,21 @@ public class DefaultListableBeanFactory implements ListableBeanFactory, BeanDefi
     private final Set<String> singletonsCurrentlyInCreation = ConcurrentHashMap.newKeySet();
     private final List<BeanPostProcessor> beanPostProcessors = new ArrayList<>();
     private ClassLoader beanClassLoader = Thread.currentThread().getContextClassLoader();
+
+    public boolean isAllowCircularReferences() {
+        return allowCircularReferences;
+    }
+
+    public void setAllowCircularReferences(boolean allowCircularReferences) {
+        this.allowCircularReferences = allowCircularReferences;
+    }
+
     private boolean allowCircularReferences = true;
+
+    public void setCurrentlyRefreshsing(boolean currentlyRefreshsing) {
+        this.currentlyRefreshsing = currentlyRefreshsing;
+    }
+
     private boolean currentlyRefreshsing = false;
 
     @Override
@@ -64,7 +78,7 @@ public class DefaultListableBeanFactory implements ListableBeanFactory, BeanDefi
     }
 
     @Override
-    public BeanDefinition getBeanDefinition(String beanName) {
+    public RootBeanDefinition getBeanDefinition(String beanName) {
         RootBeanDefinition rbd = beanDefinitionMap.get(beanName);
         if (rbd == null) {
             throw new NoSuchBeanException(beanName);

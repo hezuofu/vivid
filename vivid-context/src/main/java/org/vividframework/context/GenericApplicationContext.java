@@ -228,7 +228,7 @@ public class GenericApplicationContext implements ApplicationContext, BeanDefini
     }
 
     @Override
-    public BeanDefinition getBeanDefinition(String beanName) {
+    public RootBeanDefinition getBeanDefinition(String beanName) {
         return beanFactory.getBeanDefinition(beanName);
     }
 

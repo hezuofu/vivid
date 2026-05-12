@@ -19,7 +19,7 @@ public interface BeanDefinitionRegistry {
     /**
      * Get bean definition
      */
-    BeanDefinition getBeanDefinition(String beanName);
+    RootBeanDefinition getBeanDefinition(String beanName);
 
     /**
      * Check if contains bean definition
