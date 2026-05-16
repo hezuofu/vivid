@@ -7,6 +7,7 @@ import org.vividframework.http.HttpRequestStreamingHandler;
 import org.vividframework.http.HttpServletResponse;
 import org.vividframework.http.HttpServerRequest;
 import org.vividframework.http.StreamingHttpServerResponse;
+import org.vividframework.web.event.WebEventPublisher;
 import org.vividframework.web.filter.Filter;
 import org.vividframework.web.filter.FilterChain;
 import org.vividframework.web.handler.HandlerAdapter;
@@ -17,8 +18,8 @@ import org.vividframework.web.model.ModelAndView;
 import org.vividframework.web.resolver.HandlerExceptionResolver;
 import org.vividframework.web.resolver.ViewResolver;
 import org.vividframework.web.view.View;
-import org.vividframework.event.RequestHandledEvent;
 import org.vividframework.event.ApplicationEventPublisher;
+import org.vividframework.event.RequestHandledEvent;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -41,6 +42,7 @@ public class DispatcherHandler implements HttpRequestStreamingHandler {
     private List<ViewResolver> viewResolvers;
     private List<HandlerExceptionResolver> handlerExceptionResolvers;
     private List<Filter> filters;
+    private WebEventPublisher webEventPublisher;
     private ApplicationEventPublisher eventPublisher;
 
     public DispatcherHandler() {
@@ -80,6 +82,14 @@ public class DispatcherHandler implements HttpRequestStreamingHandler {
         loadBeansOfType(ViewResolver.class, viewResolvers);
         loadBeansOfType(HandlerExceptionResolver.class, handlerExceptionResolvers);
         loadBeansOfType(Filter.class, filters);
+        loadBeansOfType(WebEventPublisher.class, List.of());
+        // If a WebEventPublisher bean exists, use it
+        try {
+            Map<String, WebEventPublisher> pubs = applicationContext.getBeansOfType(WebEventPublisher.class);
+            if (pubs != null && !pubs.isEmpty()) {
+                webEventPublisher = pubs.values().iterator().next();
+            }
+        } catch (Exception ignored) {}
 
         if (handlerMappings.isEmpty()) {
             handlerMappings.add(new SimpleUrlHandlerMapping());
@@ -111,6 +121,8 @@ public class DispatcherHandler implements HttpRequestStreamingHandler {
         Object handler = null;
         HandlerExecutionChain executionChain = null;
 
+        publishRequestReceived(request);
+
         try {
             handler = getHandler(request);
             if (handler == null) {
@@ -135,8 +147,11 @@ public class DispatcherHandler implements HttpRequestStreamingHandler {
             executionChain.applyPostHandle(request, result);
             executionChain.triggerAfterCompletion(request, null);
 
+            publishRequestHandled(request, null, System.currentTimeMillis() - startTime);
+
         } catch (Exception e) {
             handlerException = e;
+            publishRequestFailed(request, e, System.currentTimeMillis() - startTime);
             try {
                 response.status(500).body("Error: " + e.getMessage());
             } catch (Exception ignored) {}
@@ -155,6 +170,8 @@ public class DispatcherHandler implements HttpRequestStreamingHandler {
         Exception handlerException = null;
         Object handler = null;
         HandlerExecutionChain executionChain = null;
+
+        publishRequestReceived(request);
 
         try {
             // 1. Get handler
@@ -177,6 +194,7 @@ public class DispatcherHandler implements HttpRequestStreamingHandler {
 
         } catch (Exception e) {
             handlerException = e;
+            publishRequestFailed(request, e, System.currentTimeMillis() - startTime);
             return handleException(request, e);
         } finally {
             long processingTime = System.currentTimeMillis() - startTime;
@@ -450,7 +468,29 @@ public class DispatcherHandler implements HttpRequestStreamingHandler {
         this.filters.add(filter);
     }
 
+    public void setWebEventPublisher(WebEventPublisher webEventPublisher) {
+        this.webEventPublisher = webEventPublisher;
+    }
+
     public void setEventPublisher(ApplicationEventPublisher eventPublisher) {
         this.eventPublisher = eventPublisher;
+    }
+
+    private void publishRequestReceived(HttpServerRequest request) {
+        if (webEventPublisher != null) {
+            webEventPublisher.publishRequestReceived(request);
+        }
+    }
+
+    private void publishRequestHandled(HttpServerRequest request, HttpServletResponse response, long elapsed) {
+        if (webEventPublisher != null) {
+            webEventPublisher.publishRequestHandled(request, response, elapsed);
+        }
+    }
+
+    private void publishRequestFailed(HttpServerRequest request, Exception ex, long elapsed) {
+        if (webEventPublisher != null) {
+            webEventPublisher.publishRequestFailed(request, ex, elapsed);
+        }
     }
 }

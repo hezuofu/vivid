@@ -10,9 +10,14 @@ import org.vividframework.beans.scanner.ClassPathBeanDefinitionScanner;
 import org.vividframework.context.GenericApplicationContext;
 import org.vividframework.web.DispatcherHandler;
 import org.vividframework.web.RequestMappingHandlerMapping;
+import org.vividframework.web.event.WebEventPublisher;
+import org.vividframework.web.filter.Filter;
+import org.vividframework.web.handler.ExceptionHandler;
 import org.vividframework.web.handler.ExceptionHandlerRegistry;
+import org.vividframework.web.interceptor.HandlerInterceptor;
 import org.vividframework.webmvc.ExceptionHandlerExceptionResolver;
 import org.vividframework.webmvc.RequestMappingHandlerAdapter;
+import org.vividframework.webmvc.ResponseBodyAdvice;
 import org.vividframework.server.netty.NettyHttpServer;
 import org.vividframework.server.AbstractHttpServer;
 import org.vividframework.web.resolver.TemplateViewResolver;
@@ -41,6 +46,17 @@ public class SpringApplication {
     private GenericApplicationContext applicationContext;
     private AbstractHttpServer webServer;
     private String[] args;
+
+    // Programmatic registrations
+    private int serverPort = 8080;
+    private String templatePath = "templates/";
+    private boolean scanAnnotations = true;
+    private String[] scanPackages;
+    private final List<ExceptionHandler<?>> programmaticExceptionHandlers = new ArrayList<>();
+    private final List<HandlerInterceptor> programmaticInterceptors = new ArrayList<>();
+    private final List<Filter> programmaticFilters = new ArrayList<>();
+    private final List<ViewResolver> programmaticViewResolvers = new ArrayList<>();
+    private final List<ResponseBodyAdvice> programmaticResponseAdvices = new ArrayList<>();
 
     public SpringApplication(Class<?> primarySource) {
         this.primarySource = primarySource;
@@ -99,7 +115,7 @@ public class SpringApplication {
         
         // Set defaults
         if (env.getProperty("server.port") == null) {
-            env.setProperty("server.port", "8080");
+            env.setProperty("server.port", String.valueOf(serverPort));
         }
     }
 
@@ -115,6 +131,9 @@ public class SpringApplication {
 
         // Scan and register beans
         scanAndRegisterBeans(context);
+
+        // Register programmatic components
+        registerProgrammaticComponents(context);
 
         // Add event publisher
         ApplicationEventPublisher.SimpleApplicationEventPublisher eventPublisher =
@@ -175,21 +194,23 @@ public class SpringApplication {
     }
 
     protected void scanAndRegisterBeans(GenericApplicationContext context) {
-        // Check for @ComponentScan on primary source
-        ComponentScan componentScan = primarySource.getAnnotation(ComponentScan.class);
+        if (!scanAnnotations) return;
+
         String[] basePackages;
-        
-        if (componentScan != null) {
-            basePackages = getComponentScanPackages(componentScan);
+        if (scanPackages != null) {
+            basePackages = scanPackages;
         } else {
-            // Default to the package of the primary source
-            basePackages = new String[]{getBasePackage(primarySource)};
+            ComponentScan componentScan = primarySource.getAnnotation(ComponentScan.class);
+            if (componentScan != null) {
+                basePackages = getComponentScanPackages(componentScan);
+            } else {
+                basePackages = new String[]{getBasePackage(primarySource)};
+            }
         }
 
-        // Use ClassPathBeanDefinitionScanner
         ClassPathBeanDefinitionScanner scanner = new ClassPathBeanDefinitionScanner(context);
         scanner.scan(basePackages);
-        
+
         logger.info("Scanned {} packages: {}", basePackages.length, Arrays.toString(basePackages));
     }
 
@@ -273,9 +294,14 @@ public class SpringApplication {
                 createBeanDefinition(ViewResolver.class, xmlViewResolver));
 
         // Template file resolver (falls through for non-prefixed names)
-        TemplateViewResolver templateResolver = new TemplateViewResolver();
+        TemplateViewResolver templateResolver = new TemplateViewResolver(templatePath, ".html");
         context.registerBeanDefinition("templateViewResolver",
                 createBeanDefinition(TemplateViewResolver.class, templateResolver));
+
+        // Web event publisher — auto-discovers WebEventListener beans
+        WebEventPublisher eventPublisher = new WebEventPublisher(context);
+        context.registerBeanDefinition("webEventPublisher",
+                createBeanDefinition(WebEventPublisher.class, eventPublisher));
 
         // Exception handler registry — interface-based, auto-discovers ExceptionHandler beans
         ExceptionHandlerRegistry exceptionRegistry = new ExceptionHandlerRegistry(context);
@@ -291,6 +317,36 @@ public class SpringApplication {
 
     protected String getBasePackage(Class<?> clazz) {
         return clazz.getPackage().getName();
+    }
+
+    protected void registerProgrammaticComponents(GenericApplicationContext context) {
+        // Register programmatic exception handlers
+        for (ExceptionHandler<?> handler : programmaticExceptionHandlers) {
+            String name = "exceptionHandler-" + handler.getClass().getSimpleName();
+            context.registerBeanDefinition(name, createBeanDefinition(ExceptionHandler.class, handler));
+        }
+        // Register programmatic interceptors
+        for (int i = 0; i < programmaticInterceptors.size(); i++) {
+            String name = "interceptor-" + i;
+            context.registerBeanDefinition(name,
+                    createBeanDefinition(HandlerInterceptor.class, programmaticInterceptors.get(i)));
+        }
+        // Register programmatic filters
+        for (Filter filter : programmaticFilters) {
+            String name = "filter-" + filter.getClass().getSimpleName();
+            context.registerBeanDefinition(name, createBeanDefinition(Filter.class, filter));
+        }
+        // Register programmatic view resolvers
+        for (int i = 0; i < programmaticViewResolvers.size(); i++) {
+            String name = "viewResolver-" + i;
+            context.registerBeanDefinition(name,
+                    createBeanDefinition(ViewResolver.class, programmaticViewResolvers.get(i)));
+        }
+        // Register programmatic response body advices
+        for (ResponseBodyAdvice advice : programmaticResponseAdvices) {
+            String name = "responseAdvice-" + advice.getClass().getSimpleName();
+            context.registerBeanDefinition(name, createBeanDefinition(ResponseBodyAdvice.class, advice));
+        }
     }
 
     protected RootBeanDefinition createBeanDefinition(Class<?> type, Object instance) {
@@ -320,6 +376,35 @@ public class SpringApplication {
         webServer.start();
         logger.info("Web server started on port {}", port);
     }
+
+    // --- Programmatic registration API ---
+
+    public void setServerPort(int port) { this.serverPort = port; }
+    public void setTemplatePath(String path) { this.templatePath = path; }
+    public void setScanAnnotations(boolean scan) { this.scanAnnotations = scan; }
+    public void setScanPackages(String[] packages) { this.scanPackages = packages; }
+
+    public void registerExceptionHandler(ExceptionHandler<?> handler) {
+        programmaticExceptionHandlers.add(handler);
+    }
+
+    public void registerInterceptor(HandlerInterceptor interceptor) {
+        programmaticInterceptors.add(interceptor);
+    }
+
+    public void registerFilter(Filter filter) {
+        programmaticFilters.add(filter);
+    }
+
+    public void registerViewResolver(ViewResolver resolver) {
+        programmaticViewResolvers.add(resolver);
+    }
+
+    public void registerResponseBodyAdvice(ResponseBodyAdvice advice) {
+        programmaticResponseAdvices.add(advice);
+    }
+
+    // --- Standard setters ---
 
     public void setDefaultProperties(Properties properties) {
         this.defaultProperties = properties;
