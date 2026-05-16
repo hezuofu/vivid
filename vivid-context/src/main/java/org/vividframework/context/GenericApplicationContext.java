@@ -4,8 +4,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vividframework.beans.BeanDefinition;
 import org.vividframework.beans.BeanDefinitionRegistry;
+import org.vividframework.beans.BeanFactoryPostProcessor;
 import org.vividframework.beans.BeanPostProcessor;
 import org.vividframework.beans.DefaultListableBeanFactory;
+import org.vividframework.beans.DisposableBean;
 import org.vividframework.beans.RootBeanDefinition;
 import org.vividframework.beans.annotation.Component;
 import org.vividframework.beans.annotation.ComponentScan;
@@ -14,6 +16,9 @@ import org.vividframework.beans.scanner.ClassPathBeanDefinitionScanner;
 import org.vividframework.config.Environment;
 
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
@@ -134,7 +139,19 @@ public class GenericApplicationContext implements ApplicationContext, BeanDefini
 
     protected void destroySingletons() {
         logger.debug("Destroying singletons in context '{}'", this);
-        // TODO: Implement singleton destruction with DisposableBean
+        Map<String, Object> singletons = beanFactory.getSingletonObjects();
+        for (Map.Entry<String, Object> entry : singletons.entrySet()) {
+            Object bean = entry.getValue();
+            if (bean instanceof DisposableBean) {
+                try {
+                    ((DisposableBean) bean).destroy();
+                    logger.debug("Destroyed singleton '{}'", entry.getKey());
+                } catch (Exception e) {
+                    logger.warn("Error destroying singleton '{}'", entry.getKey(), e);
+                }
+            }
+        }
+        beanFactory.clearSingletonCache();
     }
 
     @Override
@@ -330,9 +347,45 @@ public class GenericApplicationContext implements ApplicationContext, BeanDefini
     }
 
     protected void invokeBeanFactoryProcessors(DefaultListableBeanFactory beanFactory) {
-        // Invoke BeanFactoryPostProcessor beans
-        // For now, skip - would need BeanFactoryPostProcessor interface
-        logger.debug("Invoked {} bean factory processors", 0);
+        List<BeanFactoryPostProcessor> processors = new ArrayList<>();
+
+        for (String beanName : beanFactory.getBeanDefinitionNames()) {
+            try {
+                RootBeanDefinition bd = beanFactory.getBeanDefinition(beanName);
+                Class<?> beanClass = resolveBeanClass(bd);
+                if (beanClass != null && BeanFactoryPostProcessor.class.isAssignableFrom(beanClass)) {
+                    BeanFactoryPostProcessor processor = (BeanFactoryPostProcessor) beanClass
+                            .getDeclaredConstructor().newInstance();
+                    processors.add(processor);
+                }
+            } catch (Exception e) {
+                logger.debug("Skipping BeanFactoryPostProcessor '{}': {}", beanName, e.getMessage());
+            }
+        }
+
+        for (BeanFactoryPostProcessor processor : processors) {
+            try {
+                processor.postProcessBeanFactory(beanFactory);
+            } catch (Exception e) {
+                logger.error("BeanFactoryPostProcessor {} failed", processor.getClass().getName(), e);
+            }
+        }
+
+        logger.debug("Invoked {} bean factory processors", processors.size());
+    }
+
+    private Class<?> resolveBeanClass(RootBeanDefinition bd) {
+        try {
+            if (bd.getBeanClass() != null) {
+                return bd.getBeanClass();
+            }
+            if (bd.getBeanClassName() != null) {
+                return Thread.currentThread().getContextClassLoader().loadClass(bd.getBeanClassName());
+            }
+        } catch (ClassNotFoundException e) {
+            // ignore
+        }
+        return null;
     }
 
     protected void registerBeanPostProcessors(DefaultListableBeanFactory beanFactory) {

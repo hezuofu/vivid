@@ -377,6 +377,13 @@ public class DefaultListableBeanFactory implements ListableBeanFactory, BeanDefi
         singletonObjects.clear();
     }
 
+    /**
+     * Get all singleton bean instances
+     */
+    public Map<String, Object> getSingletonObjects() {
+        return Collections.unmodifiableMap(singletonObjects);
+    }
+
     // Exception classes
     public static class NoSuchBeanException extends RuntimeException {
         private final String beanName;

@@ -1,0 +1,5 @@
+# Vivid Framework Auto-Configuration
+# List auto-configuration classes under the key below (comma-separated)
+# Each class must be annotated with @Component or end with "Configuration"
+org.vividframework.boot.autoconfigure.EnableAutoConfiguration=\
+org.vividframework.boot.autoconfigure.AutoConfigurationMetadata
