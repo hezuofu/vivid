@@ -58,7 +58,7 @@ public interface Advised {
     class AdvisedSupport implements Advised {
 
         private final Class<?> targetClass;
-        private final Object target;
+        private Object target;
         private final List<Advisor> advisors = new ArrayList<>();
         private boolean proxyTargetClass = false;
 
@@ -114,6 +114,10 @@ public interface Advised {
                 return Proxy.newProxyInstance(classLoader, new Class[]{targetClass}, new JdkDynamicAopProxy(this));
             }
             return new CglibAopProxy(this).getProxy(classLoader);
+        }
+
+        public void setTarget(Object target) {
+            this.target = target;
         }
 
         public boolean isProxyTargetClass() {
@@ -205,15 +209,7 @@ public interface Advised {
     /**
      * Method invocation interface
      */
-    interface MethodInvocation {
-
-        Object proceed() throws Throwable;
-
-        Method getMethod();
-
-        Object[] getArguments();
-
-        Object getTarget();
+    interface MethodInvocation extends org.vividframework.aop.MethodInvocation {
 
         Class<?> getDeclaringType();
     }

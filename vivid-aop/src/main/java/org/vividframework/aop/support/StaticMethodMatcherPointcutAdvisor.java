@@ -3,7 +3,6 @@ package org.vividframework.aop.support;
 import org.vividframework.aop.Advice;
 import org.vividframework.aop.Advisor;
 import org.vividframework.aop.Pointcut;
-import org.vividframework.aop.MethodMatcher;
 
 import java.lang.reflect.Method;
 
@@ -38,7 +37,6 @@ public class StaticMethodMatcherPointcutAdvisor implements Advisor {
         this.advice = advice;
     }
 
-    @Override
     public Pointcut getPointcut() {
         return pointcut;
     }
@@ -56,7 +54,7 @@ public class StaticMethodMatcherPointcutAdvisor implements Advisor {
             if (!p.getClassFilter().matches(targetClass)) {
                 return false;
             }
-            MethodMatcher mm = p.getMethodMatcher();
+            Pointcut.MethodMatcher mm = p.getMethodMatcher();
             if (mm != null) {
                 return mm.matches(method, targetClass);
             }
@@ -64,21 +62,4 @@ public class StaticMethodMatcherPointcutAdvisor implements Advisor {
         return true;
     }
 
-    /**
-     * Create an advisor for a specific advice and method matcher
-     */
-    public static StaticMethodMatcherPointcutAdvisor create(Advice advice, MethodMatcher methodMatcher) {
-        return new StaticMethodMatcherPointcutAdvisor(advice, 
-            new Pointcut() {
-                @Override
-                public ClassFilter getClassFilter() {
-                    return ClassFilter.TRUE;
-                }
-
-                @Override
-                public MethodMatcher getMethodMatcher() {
-                    return methodMatcher;
-                }
-            });
-    }
 }

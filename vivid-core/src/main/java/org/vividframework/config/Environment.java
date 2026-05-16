@@ -59,6 +59,11 @@ public interface Environment {
     boolean acceptsProfiles(String... profiles);
 
     /**
+     * Set a property
+     */
+    void setProperty(String key, String value);
+
+    /**
      * Get property sources
      */
     List<PropertySource<?>> getPropertySources();
@@ -156,6 +161,11 @@ public interface Environment {
         @Override
         public List<PropertySource<?>> getPropertySources() {
             return java.util.Collections.unmodifiableList(propertySources);
+        }
+
+        @Override
+        public void setProperty(String key, String value) {
+            properties.put(key, value);
         }
 
         public void setProperty(String key, Object value) {

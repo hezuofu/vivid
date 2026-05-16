@@ -1,24 +1,54 @@
 package org.vividframework.webmvc;
 
 import org.vividframework.handler.HandlerMethod;
+import org.vividframework.http.server.HttpServerRequest;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 
 /**
- * Extended InvocableHandlerMethod for webmvc module
+ * Invocable handler method that resolves arguments via HandlerMethodArgumentResolver.
  * @author Jon Fisher
  */
-public class InvocableHandlerMethod extends org.vividframework.handler.InvocableHandlerMethod {
+public class InvocableHandlerMethod {
 
-    public InvocableHandlerMethod(Object bean, Method method) {
-        super(bean, method);
-    }
+    private final HandlerMethod handlerMethod;
+    private HandlerMethodArgumentResolverComposite argumentResolvers;
 
     public InvocableHandlerMethod(HandlerMethod handlerMethod) {
-        super(handlerMethod);
+        this.handlerMethod = handlerMethod;
     }
 
     public void setArgumentResolvers(HandlerMethodArgumentResolverComposite argumentResolvers) {
-        // Already handled in parent class
+        this.argumentResolvers = argumentResolvers;
+    }
+
+    public Object invoke(HttpServerRequest request) throws Exception {
+        Object[] args = getMethodArgumentValues(request);
+        return doInvoke(args);
+    }
+
+    private Object[] getMethodArgumentValues(HttpServerRequest request) throws Exception {
+        HandlerMethod.MethodParameter[] parameters = handlerMethod.getParameters();
+        Object[] args = new Object[parameters.length];
+
+        for (int i = 0; i < parameters.length; i++) {
+            Parameter param = parameters[i].getParameter();
+            if (argumentResolvers != null && argumentResolvers.supports(handlerMethod, param)) {
+                args[i] = argumentResolvers.resolveArgument(handlerMethod, request, param);
+            }
+        }
+
+        return args;
+    }
+
+    private Object doInvoke(Object[] args) throws Exception {
+        Method method = handlerMethod.getMethod();
+        method.setAccessible(true);
+        return method.invoke(handlerMethod.getBean(), args);
+    }
+
+    public HandlerMethod getHandlerMethod() {
+        return handlerMethod;
     }
 }

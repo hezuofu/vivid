@@ -6,7 +6,6 @@ import org.vividframework.aop.Advised;
 import org.vividframework.aop.Advisor;
 import org.vividframework.aop.CglibAopProxy;
 import org.vividframework.aop.Pointcut;
-import org.vividframework.aop.support.AdvisedSupport;
 import org.vividframework.beans.BeanFactory;
 import org.vividframework.beans.BeanPostProcessor;
 
@@ -48,7 +47,7 @@ public class AnnotationAwareAspectJAutoProxyCreator implements BeanPostProcessor
         if (!isInfrastructureClass(bean.getClass())) {
             // Look for advisors that match this bean
             Class<?> targetClass = bean.getClass();
-            AdvisedSupport advisedSupport = createAdvisedSupport(targetClass);
+            Advised.AdvisedSupport advisedSupport = createAdvisedSupport(targetClass);
             
             if (advisedSupport.hasAdvisors()) {
                 return wrapWithProxy(bean, targetClass, advisedSupport);
@@ -65,8 +64,8 @@ public class AnnotationAwareAspectJAutoProxyCreator implements BeanPostProcessor
                clazz.getName().startsWith("org.vividframework.aop.autoproxy");
     }
 
-    protected AdvisedSupport createAdvisedSupport(Class<?> targetClass) {
-        AdvisedSupport advisedSupport = new AdvisedSupport(targetClass);
+    protected Advised.AdvisedSupport createAdvisedSupport(Class<?> targetClass) {
+        Advised.AdvisedSupport advisedSupport = new Advised.AdvisedSupport(targetClass);
         advisedSupport.setProxyTargetClass(proxyTargetClass);
         
         // In a full implementation, this would look up advisors from the bean factory
@@ -75,7 +74,7 @@ public class AnnotationAwareAspectJAutoProxyCreator implements BeanPostProcessor
         return advisedSupport;
     }
 
-    protected Object wrapWithProxy(Object target, Class<?> targetClass, AdvisedSupport advisedSupport) {
+    protected Object wrapWithProxy(Object target, Class<?> targetClass, Advised.AdvisedSupport advisedSupport) {
         advisedSupport.setTarget(target);
         
         try {

@@ -71,7 +71,7 @@ public class CglibAopProxy {
                     }
 
                     // Create method invocation
-                    MethodInvocation invocation = new Advised.MethodInvocation() {
+                    Advised.MethodInvocation invocation = new Advised.MethodInvocation() {
                         private int currentInterceptorIndex = -1;
                         private final List<Advisor> advisors = advised.getAdvisors();
 
@@ -86,8 +86,8 @@ public class CglibAopProxy {
                                 return methodProxy.invokeSuper(proxy, args);
                             }
                             Advisor advisor = advisors.get(currentInterceptorIndex);
-                            if (advisor.getAdvice() instanceof MethodInterceptor) {
-                                return ((MethodInterceptor) advisor.getAdvice()).invoke(this);
+                            if (advisor.getAdvice() instanceof org.vividframework.aop.MethodInterceptor) {
+                                return ((org.vividframework.aop.MethodInterceptor) advisor.getAdvice()).invoke(this);
                             }
                             return proceed();
                         }
