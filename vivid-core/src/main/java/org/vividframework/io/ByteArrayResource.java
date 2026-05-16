@@ -6,7 +6,7 @@ import java.net.URL;
 
 /**
  * Resource implementation for byte array resources
- * @author Jon Fisher
+ * @author sketch
  */
 public class ByteArrayResource implements Resource {
 

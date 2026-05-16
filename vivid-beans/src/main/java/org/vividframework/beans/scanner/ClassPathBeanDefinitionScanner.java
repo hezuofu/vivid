@@ -23,7 +23,7 @@ import java.util.jar.JarInputStream;
 /**
  * Class path bean definition scanner.
  * Scans classpath for components annotated with @Component, @Service, @Controller, etc.
- * @author Jon Fisher
+ * @author sketch
  */
 public class ClassPathBeanDefinitionScanner {
 

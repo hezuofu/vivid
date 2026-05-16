@@ -2,7 +2,7 @@ package org.vividframework.security;
 
 /**
  * Security context holder
- * @author Jon Fisher
+ * @author sketch
  */
 public class SecurityContextHolder {
 

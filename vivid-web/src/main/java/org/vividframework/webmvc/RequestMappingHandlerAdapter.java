@@ -16,7 +16,7 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * Handler adapter for request mapping handler methods
- * @author Jon Fisher
+ * @author sketch
  */
 public class RequestMappingHandlerAdapter implements HandlerAdapter {
 
@@ -131,6 +131,17 @@ public class RequestMappingHandlerAdapter implements HandlerAdapter {
 
     public HandlerMethodReturnValueHandlerComposite getReturnValueHandlers() {
         return returnValueHandlers;
+    }
+
+    /**
+     * Register ResponseBodyAdvice beans for response wrapping.
+     */
+    public void addResponseBodyAdvice(ResponseBodyAdvice advice) {
+        for (HandlerMethodReturnValueHandler h : returnValueHandlers.getHandlers()) {
+            if (h instanceof RequestResponseBodyMethodProcessor processor) {
+                processor.addAdvice(advice);
+            }
+        }
     }
 
     public void setControllerAdviceResolvers(List<ControllerAdviceResolver> controllerAdviceResolvers) {

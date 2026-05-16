@@ -2,7 +2,7 @@ package org.vividframework.transaction;
 
 /**
  * Platform transaction manager interface
- * @author Jon Fisher
+ * @author sketch
  */
 public interface PlatformTransactionManager {
 

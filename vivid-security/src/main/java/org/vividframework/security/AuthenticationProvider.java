@@ -2,7 +2,7 @@ package org.vividframework.security;
 
 /**
  * Interface for authentication providers
- * @author Jon Fisher
+ * @author sketch
  */
 public interface AuthenticationProvider {
 

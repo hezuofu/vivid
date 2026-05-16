@@ -5,7 +5,7 @@ import java.io.IOException;
 
 /**
  * Default implementation of ResourceLoader
- * @author Jon Fisher
+ * @author sketch
  */
 public class DefaultResourceLoader implements ResourceLoader {
 

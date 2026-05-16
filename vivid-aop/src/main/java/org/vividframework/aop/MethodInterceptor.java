@@ -2,7 +2,7 @@ package org.vividframework.aop;
 
 /**
  * Method interceptor interface
- * @author Jon Fisher
+ * @author sketch
  */
 public interface MethodInterceptor extends Advice {
 

@@ -8,7 +8,7 @@ import java.util.*;
 
 /**
  * Composite implementation of HandlerMethodReturnValueHandler
- * @author Jon Fisher
+ * @author sketch
  */
 public class HandlerMethodReturnValueHandlerComposite {
 

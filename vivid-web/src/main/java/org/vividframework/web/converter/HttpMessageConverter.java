@@ -6,7 +6,7 @@ import org.vividframework.http.HttpServerRequest;
 
 /**
  * HTTP message converter interface for reading/writing objects
- * @author Jon Fisher
+ * @author sketch
  */
 public interface HttpMessageConverter<T> {
 

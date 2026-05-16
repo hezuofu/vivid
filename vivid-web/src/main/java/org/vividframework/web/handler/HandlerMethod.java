@@ -8,7 +8,7 @@ import java.util.Map;
 
 /**
  * Handler method representation (similar to Spring's HandlerMethod)
- * @author Jon Fisher
+ * @author sketch
  */
 public class HandlerMethod {
 

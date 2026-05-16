@@ -9,7 +9,7 @@ import java.util.Map;
  * XML view with simple template rendering.
  * Supports {@code {{key}}} placeholders replaced with model values.
  * Auto-wraps bare content in {@code <?xml?>} prolog.
- * @author Jon Fisher
+ * @author sketch
  */
 public class XmlView extends View.AbstractView {
 

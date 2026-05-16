@@ -5,7 +5,7 @@ import java.util.Objects;
 
 /**
  * Property source abstraction
- * @author Jon Fisher
+ * @author sketch
  */
 public abstract class PropertySource<T> {
 

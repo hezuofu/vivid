@@ -2,7 +2,7 @@ package org.vividframework.security;
 
 /**
  * Base class for authentication exceptions
- * @author Jon Fisher
+ * @author sketch
  */
 public class AuthenticationException extends RuntimeException {
 

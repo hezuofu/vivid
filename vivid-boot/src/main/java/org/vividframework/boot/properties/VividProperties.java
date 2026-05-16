@@ -4,7 +4,7 @@ import org.vividframework.boot.properties.annotation.ConfigurationProperties;
 
 /**
  * Base class for configuration properties
- * @author Jon Fisher
+ * @author sketch
  */
 public abstract class VividProperties {
 

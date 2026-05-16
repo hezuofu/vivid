@@ -6,7 +6,7 @@ import java.lang.annotation.*;
 
 /**
  * Transactional annotation
- * @author Jon Fisher
+ * @author sketch
  */
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)

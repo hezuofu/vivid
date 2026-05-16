@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Autowired annotation bean post processor.
  * Handles @Autowired injection for fields, methods, and constructors.
- * @author Jon Fisher
+ * @author sketch
  */
 public class AutowiredAnnotationBeanPostProcessor implements BeanPostProcessor {
 

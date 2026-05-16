@@ -4,7 +4,7 @@ import java.lang.annotation.*;
 
 /**
  * Indicates component scanning configurations.
- * @author Jon Fisher
+ * @author sketch
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

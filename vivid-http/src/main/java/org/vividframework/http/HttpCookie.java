@@ -4,7 +4,7 @@ import java.util.Objects;
 
 /**
  * Immutable HTTP Cookie implementation
- * @author Jon Fisher
+ * @author sketch
  */
 public final class HttpCookie {
 

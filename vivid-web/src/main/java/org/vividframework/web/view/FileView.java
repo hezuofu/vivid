@@ -15,7 +15,7 @@ import java.util.Map;
 /**
  * View for streaming file downloads. Supports range requests via the model.
  * Uses streaming mode to avoid loading entire files into memory.
- * @author Jon Fisher
+ * @author sketch
  */
 public class FileView implements View {
 

@@ -13,7 +13,7 @@ import java.util.Map;
  * Buffered views (JsonView, RedirectView, etc.) render into a builder.
  * Streaming views (FileView, SseView) write directly to an output stream.
  *
- * @author Jon Fisher
+ * @author sketch
  */
 public interface View {
 

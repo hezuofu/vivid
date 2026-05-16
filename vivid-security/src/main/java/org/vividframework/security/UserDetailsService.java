@@ -4,7 +4,7 @@ import java.util.Collection;
 
 /**
  * Interface for loading user-specific data
- * @author Jon Fisher
+ * @author sketch
  */
 public interface UserDetailsService {
 

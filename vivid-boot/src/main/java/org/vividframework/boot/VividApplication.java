@@ -9,7 +9,7 @@ import java.util.Properties;
 
 /**
  * Vivid Application entry point
- * @author Jon Fisher
+ * @author sketch
  */
 public class VividApplication {
 

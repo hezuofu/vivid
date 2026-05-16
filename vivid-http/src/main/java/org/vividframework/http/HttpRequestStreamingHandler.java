@@ -4,7 +4,7 @@ package org.vividframework.http;
  * A request handler that supports streaming responses via StreamingHttpServerResponse.
  * Implement this instead of the basic HttpRequestHandler to enable SSE, file downloads,
  * and other streaming use cases.
- * @author Jon Fisher
+ * @author sketch
  */
 public interface HttpRequestStreamingHandler {
 

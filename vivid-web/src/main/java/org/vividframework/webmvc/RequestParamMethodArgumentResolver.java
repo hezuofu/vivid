@@ -9,7 +9,7 @@ import java.util.Map;
 
 /**
  * Resolver for @RequestParam annotated method parameters
- * @author Jon Fisher
+ * @author sketch
  */
 public class RequestParamMethodArgumentResolver implements HandlerMethodArgumentResolver {
 

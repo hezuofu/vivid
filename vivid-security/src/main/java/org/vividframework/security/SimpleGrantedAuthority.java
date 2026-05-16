@@ -2,7 +2,7 @@ package org.vividframework.security;
 
 /**
  * Simple granted authority implementation
- * @author Jon Fisher
+ * @author sketch
  */
 public class SimpleGrantedAuthority implements GrantedAuthority {
 

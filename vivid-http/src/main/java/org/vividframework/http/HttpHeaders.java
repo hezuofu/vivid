@@ -4,7 +4,7 @@ import java.util.*;
 
 /**
  * Immutable HTTP headers implementation similar to Spring's HttpHeaders
- * @author Jon Fisher
+ * @author sketch
  */
 public final class HttpHeaders implements Iterable<String> {
 

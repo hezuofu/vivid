@@ -13,7 +13,7 @@ import java.util.Set;
 
 /**
  * CORS (Cross-Origin Resource Sharing) filter
- * @author Jon Fisher
+ * @author sketch
  */
 public class CorsFilter extends OncePerRequestFilter {
 

@@ -14,7 +14,7 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * HTTP message converter using Jackson for JSON
- * @author Jon Fisher
+ * @author sketch
  */
 public class MappingJackson2HttpMessageConverter extends HttpMessageConverter.AbstractHttpMessageConverter<Object> {
 

@@ -4,7 +4,7 @@ import java.util.function.Consumer;
 
 /**
  * Application event publisher interface
- * @author Jon Fisher
+ * @author sketch
  */
 public interface ApplicationEventPublisher {
 

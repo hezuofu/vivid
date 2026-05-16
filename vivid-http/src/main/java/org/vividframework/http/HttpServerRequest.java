@@ -11,7 +11,7 @@ import java.util.function.Supplier;
 
 /**
  * Server-side HTTP request interface
- * @author Jon Fisher
+ * @author sketch
  */
 public interface HttpServerRequest {
 

@@ -7,7 +7,7 @@ import java.util.*;
 
 /**
  * Root bean definition
- * @author Jon Fisher
+ * @author sketch
  */
 public class RootBeanDefinition implements BeanDefinition {
 

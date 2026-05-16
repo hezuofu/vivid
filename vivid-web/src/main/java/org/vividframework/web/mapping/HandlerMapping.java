@@ -9,7 +9,7 @@ import java.util.TreeMap;
 
 /**
  * Handler mapping interface for mapping requests to handlers
- * @author Jon Fisher
+ * @author sketch
  */
 public interface HandlerMapping {
 

@@ -4,7 +4,7 @@ import java.lang.annotation.*;
 
 /**
  * Annotation for handling exceptions in controller advice
- * @author Jon Fisher
+ * @author sketch
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

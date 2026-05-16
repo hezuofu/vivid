@@ -2,7 +2,7 @@ package org.vividframework.beans;
 
 /**
  * Factory bean interface
- * @author Jon Fisher
+ * @author sketch
  */
 public interface FactoryBean<T> {
 

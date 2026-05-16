@@ -6,7 +6,7 @@ import org.vividframework.http.HttpServerResponse;
 
 /**
  * Security filter for authentication
- * @author Jon Fisher
+ * @author sketch
  */
 public class AuthenticationFilter implements org.vividframework.web.filter.Filter {
 

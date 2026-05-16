@@ -9,7 +9,7 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * Filter for setting character encoding
- * @author Jon Fisher
+ * @author sketch
  */
 public class CharacterEncodingFilter extends OncePerRequestFilter {
 

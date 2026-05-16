@@ -8,7 +8,7 @@ import java.util.Map;
 
 /**
  * JSON view that renders model as JSON using Jackson.
- * @author Jon Fisher
+ * @author sketch
  */
 public class JsonView extends View.AbstractView {
 

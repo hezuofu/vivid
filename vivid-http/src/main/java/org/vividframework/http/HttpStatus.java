@@ -2,7 +2,7 @@ package org.vividframework.http;
 
 /**
  * HTTP status codes enumeration
- * @author Jon Fisher
+ * @author sketch
  */
 public enum HttpStatus {
     CONTINUE(100, "Continue"),

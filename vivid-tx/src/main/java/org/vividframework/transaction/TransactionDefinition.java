@@ -2,7 +2,7 @@ package org.vividframework.transaction;
 
 /**
  * Transaction definition
- * @author Jon Fisher
+ * @author sketch
  */
 public interface TransactionDefinition {
 

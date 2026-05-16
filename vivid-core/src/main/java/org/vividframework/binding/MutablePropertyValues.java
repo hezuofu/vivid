@@ -4,7 +4,7 @@ import java.util.*;
 
 /**
  * Mutable property values holder
- * @author Jon Fisher
+ * @author sketch
  */
 public class MutablePropertyValues implements PropertyValues {
 

@@ -9,7 +9,7 @@ import java.util.List;
 
 /**
  * Strategy interface for resolving method argument values
- * @author Jon Fisher
+ * @author sketch
  */
 public interface HandlerMethodArgumentResolver {
 

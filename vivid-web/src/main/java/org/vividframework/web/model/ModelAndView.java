@@ -2,7 +2,7 @@ package org.vividframework.web.model;
 
 /**
  * Holder for model and view information
- * @author Jon Fisher
+ * @author sketch
  */
 public class ModelAndView {
 

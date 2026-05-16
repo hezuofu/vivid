@@ -65,4 +65,18 @@ public class SampleController {
     public ModelAndView redirect() {
         return new ModelAndView("redirect:/api/hello?name=Redirected");
     }
+
+    /** Trigger exception handler: GET /api/error */
+    @GetMapping("/api/error")
+    @ResponseBody
+    public String triggerError() {
+        throw new IllegalArgumentException("This is a test exception from /api/error");
+    }
+
+    /** Trigger global exception: GET /api/null-error */
+    @GetMapping("/api/null-error")
+    @ResponseBody
+    public String nullError() {
+        throw new RuntimeException("Unexpected runtime error");
+    }
 }

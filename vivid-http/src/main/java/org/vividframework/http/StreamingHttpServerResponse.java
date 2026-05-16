@@ -5,7 +5,7 @@ import java.io.OutputStream;
 /**
  * Extended server response supporting streaming writes.
  * Used by streaming views (file download, SSE, etc.).
- * @author Jon Fisher
+ * @author sketch
  */
 public interface StreamingHttpServerResponse extends HttpServerResponse {
 

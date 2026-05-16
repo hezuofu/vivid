@@ -2,7 +2,7 @@ package org.vividframework.transaction;
 
 /**
  * Transaction status
- * @author Jon Fisher
+ * @author sketch
  */
 public interface TransactionStatus {
 

@@ -2,7 +2,7 @@ package org.vividframework.beans;
 
 /**
  * Interface for beans that need to be destroyed
- * @author Jon Fisher
+ * @author sketch
  */
 public interface DisposableBean {
 

@@ -2,7 +2,7 @@ package org.vividframework.security;
 
 /**
  * Interface for password encoding
- * @author Jon Fisher
+ * @author sketch
  */
 public interface PasswordEncoder {
 

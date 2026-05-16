@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 
 /**
  * Request mapping handler mapping with URI template and meta-annotation support.
- * @author Jon Fisher
+ * @author sketch
  */
 public class RequestMappingHandlerMapping extends AbstractHandlerMapping {
 

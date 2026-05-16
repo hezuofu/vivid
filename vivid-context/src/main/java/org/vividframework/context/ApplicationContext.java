@@ -4,7 +4,7 @@ import org.vividframework.beans.ListableBeanFactory;
 
 /**
  * Application context interface
- * @author Jon Fisher
+ * @author sketch
  */
 public interface ApplicationContext extends ListableBeanFactory {
 

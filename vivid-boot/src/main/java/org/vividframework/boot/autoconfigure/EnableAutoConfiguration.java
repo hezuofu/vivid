@@ -4,7 +4,7 @@ import java.lang.annotation.*;
 
 /**
  * Enable auto configuration
- * @author Jon Fisher
+ * @author sketch
  */
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)

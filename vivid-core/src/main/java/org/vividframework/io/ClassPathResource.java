@@ -7,7 +7,7 @@ import java.net.URL;
 
 /**
  * Resource implementation for classpath resources
- * @author Jon Fisher
+ * @author sketch
  */
 public class ClassPathResource implements Resource {
 

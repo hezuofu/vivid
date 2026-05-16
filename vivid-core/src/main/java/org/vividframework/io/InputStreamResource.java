@@ -9,7 +9,7 @@ import java.net.URL;
 
 /**
  * Resource implementation for InputStream resources
- * @author Jon Fisher
+ * @author sketch
  */
 public class InputStreamResource implements Resource {
 

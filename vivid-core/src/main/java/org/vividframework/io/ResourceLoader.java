@@ -4,7 +4,7 @@ import java.io.IOException;
 
 /**
  * Interface for loading resources
- * @author Jon Fisher
+ * @author sketch
  */
 public interface ResourceLoader {
 

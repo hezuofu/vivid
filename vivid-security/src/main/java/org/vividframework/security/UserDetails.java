@@ -4,7 +4,7 @@ import java.util.Collection;
 
 /**
  * User details interface
- * @author Jon Fisher
+ * @author sketch
  */
 public interface UserDetails extends Authentication {
 

@@ -2,7 +2,7 @@ package org.vividframework.aop;
 
 /**
  * Advice interface
- * @author Jon Fisher
+ * @author sketch
  */
 public interface Advice {
 }

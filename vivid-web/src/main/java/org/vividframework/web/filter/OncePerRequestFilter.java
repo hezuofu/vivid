@@ -7,7 +7,7 @@ import org.vividframework.http.HttpServerRequest;
 
 /**
  * Base class for filters that should only execute once per request
- * @author Jon Fisher
+ * @author sketch
  */
 public abstract class OncePerRequestFilter implements Filter {
 

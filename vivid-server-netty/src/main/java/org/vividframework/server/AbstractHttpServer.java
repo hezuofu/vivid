@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Abstract base class for HTTP server implementations
- * @author Jon Fisher
+ * @author sketch
  */
 public abstract class AbstractHttpServer implements HttpServer {
 

@@ -5,7 +5,7 @@ import java.util.Map;
 
 /**
  * Extended ModelMap with fluent API
- * @author Jon Fisher
+ * @author sketch
  */
 public class ExtendedModelMap extends ModelMap {
 

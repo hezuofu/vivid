@@ -8,7 +8,7 @@ import java.util.Arrays;
 
 /**
  * Resolver for @ExceptionHandler methods
- * @author Jon Fisher
+ * @author sketch
  */
 public class ExceptionHandlerMethodResolver {
 

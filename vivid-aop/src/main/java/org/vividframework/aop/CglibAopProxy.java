@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * CGLIB-based AOP proxy implementation.
  * Creates subclass proxies for classes that don't implement interfaces.
- * @author Jon Fisher
+ * @author sketch
  */
 public class CglibAopProxy {
 

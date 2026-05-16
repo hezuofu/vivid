@@ -8,7 +8,7 @@ import java.util.Map;
 
 /**
  * Helper class for managing generated keys from insert operations
- * @author Jon Fisher
+ * @author sketch
  */
 public class GeneratedKeyHolder {
 

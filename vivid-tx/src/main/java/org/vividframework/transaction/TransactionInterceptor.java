@@ -11,7 +11,7 @@ import java.lang.reflect.Method;
 /**
  * Transaction interceptor for declarative transaction management.
  * Wraps method execution with transaction semantics based on @Transactional annotation.
- * @author Jon Fisher
+ * @author sketch
  */
 public class TransactionInterceptor implements MethodInterceptor {
 

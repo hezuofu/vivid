@@ -4,7 +4,7 @@ import java.lang.annotation.*;
 
 /**
  * Path variable annotation
- * @author Jon Fisher
+ * @author sketch
  */
 @Target({ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)

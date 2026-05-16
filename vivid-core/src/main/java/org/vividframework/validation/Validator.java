@@ -2,7 +2,7 @@ package org.vividframework.validation;
 
 /**
  * Validator interface
- * @author Jon Fisher
+ * @author sketch
  */
 public interface Validator {
 

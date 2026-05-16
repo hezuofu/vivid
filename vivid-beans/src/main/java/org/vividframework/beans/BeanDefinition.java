@@ -2,7 +2,7 @@ package org.vividframework.beans;
 
 /**
  * Bean definition interface
- * @author Jon Fisher
+ * @author sketch
  */
 public interface BeanDefinition {
 

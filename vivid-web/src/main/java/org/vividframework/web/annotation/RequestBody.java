@@ -4,7 +4,7 @@ import java.lang.annotation.*;
 
 /**
  * Request body annotation
- * @author Jon Fisher
+ * @author sketch
  */
 @Target({ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)

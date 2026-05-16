@@ -2,7 +2,7 @@ package org.vividframework.transaction;
 
 /**
  * Transaction exception
- * @author Jon Fisher
+ * @author sketch
  */
 public class TransactionException extends RuntimeException {
 

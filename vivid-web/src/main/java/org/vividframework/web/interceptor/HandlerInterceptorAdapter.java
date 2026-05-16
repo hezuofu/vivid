@@ -5,7 +5,7 @@ import org.vividframework.http.HttpServerRequest;
 
 /**
  * Abstract adapter for HandlerInterceptor with default implementations
- * @author Jon Fisher
+ * @author sketch
  */
 public abstract class HandlerInterceptorAdapter implements HandlerInterceptor {
 

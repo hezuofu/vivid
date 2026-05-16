@@ -10,7 +10,7 @@ import java.util.function.Supplier;
 
 /**
  * Security filter chain for protecting requests
- * @author Jon Fisher
+ * @author sketch
  */
 public class SecurityFilterChain {
 

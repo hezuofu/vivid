@@ -4,7 +4,7 @@ import java.lang.annotation.*;
 
 /**
  * Annotation for binding external configuration to a Java bean
- * @author Jon Fisher
+ * @author sketch
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

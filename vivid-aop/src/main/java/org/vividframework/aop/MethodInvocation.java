@@ -4,7 +4,7 @@ import java.lang.reflect.Method;
 
 /**
  * Method invocation interface for AOP
- * @author Jon Fisher
+ * @author sketch
  */
 public interface MethodInvocation {
 

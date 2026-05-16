@@ -4,7 +4,7 @@ import java.util.List;
 
 /**
  * Environment interface for configuration
- * @author Jon Fisher
+ * @author sketch
  */
 public interface Environment {
 

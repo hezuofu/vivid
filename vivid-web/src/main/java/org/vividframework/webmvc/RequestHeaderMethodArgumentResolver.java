@@ -9,7 +9,7 @@ import java.lang.reflect.Parameter;
 
 /**
  * Resolver for @RequestHeader annotated method parameters
- * @author Jon Fisher
+ * @author sketch
  */
 public class RequestHeaderMethodArgumentResolver implements HandlerMethodArgumentResolver {
 

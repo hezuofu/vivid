@@ -9,7 +9,7 @@ import java.util.*;
 
 /**
  * Metadata reader for auto-configuration
- * @author Jon Fisher
+ * @author sketch
  */
 public class AutoConfigurationMetadata {
 

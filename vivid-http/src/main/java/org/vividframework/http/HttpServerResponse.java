@@ -7,7 +7,7 @@ import java.util.function.Supplier;
 
 /**
  * Server-side HTTP response interface
- * @author Jon Fisher
+ * @author sketch
  */
 public interface HttpServerResponse {
 

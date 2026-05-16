@@ -4,7 +4,7 @@ import java.lang.annotation.*;
 
 /**
  * Value annotation for property injection
- * @author Jon Fisher
+ * @author sketch
  */
 @Target({ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)

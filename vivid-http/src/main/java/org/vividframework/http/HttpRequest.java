@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Immutable HTTP Request representation
- * @author Jon Fisher
+ * @author sketch
  */
 public final class HttpRequest implements HttpServerRequest {
 

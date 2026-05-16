@@ -8,7 +8,7 @@ import java.util.Base64;
 
 /**
  * Standard password encoder implementation using BCrypt-like algorithm
- * @author Jon Fisher
+ * @author sketch
  */
 public class BCryptPasswordEncoder implements PasswordEncoder {
 

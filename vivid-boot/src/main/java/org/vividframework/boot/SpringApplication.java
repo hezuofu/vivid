@@ -10,6 +10,8 @@ import org.vividframework.beans.scanner.ClassPathBeanDefinitionScanner;
 import org.vividframework.context.GenericApplicationContext;
 import org.vividframework.web.DispatcherHandler;
 import org.vividframework.web.RequestMappingHandlerMapping;
+import org.vividframework.web.handler.ExceptionHandlerRegistry;
+import org.vividframework.webmvc.ExceptionHandlerExceptionResolver;
 import org.vividframework.webmvc.RequestMappingHandlerAdapter;
 import org.vividframework.server.netty.NettyHttpServer;
 import org.vividframework.server.AbstractHttpServer;
@@ -27,7 +29,7 @@ import java.util.*;
 
 /**
  * Spring Application style runner with auto-configuration support.
- * @author Jon Fisher
+ * @author sketch
  */
 public class SpringApplication {
 
@@ -274,6 +276,17 @@ public class SpringApplication {
         TemplateViewResolver templateResolver = new TemplateViewResolver();
         context.registerBeanDefinition("templateViewResolver",
                 createBeanDefinition(TemplateViewResolver.class, templateResolver));
+
+        // Exception handler registry — interface-based, auto-discovers ExceptionHandler beans
+        ExceptionHandlerRegistry exceptionRegistry = new ExceptionHandlerRegistry(context);
+        context.registerBeanDefinition("exceptionHandlerRegistry",
+                createBeanDefinition(ExceptionHandlerRegistry.class, exceptionRegistry));
+
+        // @ControllerAdvice bridge — for annotation-based exception handling
+        ExceptionHandlerExceptionResolver adviceResolver =
+                new ExceptionHandlerExceptionResolver(context);
+        context.registerBeanDefinition("exceptionHandlerExceptionResolver",
+                createBeanDefinition(ExceptionHandlerExceptionResolver.class, adviceResolver));
     }
 
     protected String getBasePackage(Class<?> clazz) {

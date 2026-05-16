@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * HTTP Server abstraction interface
- * @author Jon Fisher
+ * @author sketch
  */
 public interface HttpServer {
 

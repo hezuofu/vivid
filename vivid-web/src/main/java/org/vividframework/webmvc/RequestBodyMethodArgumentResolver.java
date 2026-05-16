@@ -11,7 +11,7 @@ import java.nio.charset.StandardCharsets;
 /**
  * Resolver for @RequestBody annotated method parameters.
  * Uses Jackson for JSON deserialization.
- * @author Jon Fisher
+ * @author sketch
  */
 public class RequestBodyMethodArgumentResolver implements HandlerMethodArgumentResolver {
 

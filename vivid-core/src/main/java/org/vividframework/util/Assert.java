@@ -2,7 +2,7 @@ package org.vividframework.util;
 
 /**
  * Assertion utility for validation
- * @author Jon Fisher
+ * @author sketch
  */
 public final class Assert {
 

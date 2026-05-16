@@ -2,7 +2,7 @@ package org.vividframework.http;
 
 /**
  * HTTP method enumeration
- * @author Jon Fisher
+ * @author sketch
  */
 public enum HttpMethod {
     GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS, TRACE;

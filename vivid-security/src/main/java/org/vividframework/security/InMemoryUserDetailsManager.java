@@ -4,7 +4,7 @@ import java.util.*;
 
 /**
  * In-memory implementation of UserDetailsService
- * @author Jon Fisher
+ * @author sketch
  */
 public class InMemoryUserDetailsManager implements UserDetailsService {
 

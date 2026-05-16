@@ -4,7 +4,7 @@ import java.lang.annotation.*;
 
 /**
  * Bean annotation for method-level bean definition
- * @author Jon Fisher
+ * @author sketch
  */
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

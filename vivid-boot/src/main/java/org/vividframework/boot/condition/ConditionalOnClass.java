@@ -4,7 +4,7 @@ import java.lang.annotation.*;
 
 /**
  * Condition that matches when the specified class is present
- * @author Jon Fisher
+ * @author sketch
  */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

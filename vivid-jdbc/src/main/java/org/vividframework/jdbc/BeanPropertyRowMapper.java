@@ -9,7 +9,7 @@ import java.util.Map;
 
 /**
  * Row mapper that maps rows of a ResultSet to a Java object
- * @author Jon Fisher
+ * @author sketch
  */
 public class BeanPropertyRowMapper<T> implements JdbcTemplate.RowMapper<T> {
 

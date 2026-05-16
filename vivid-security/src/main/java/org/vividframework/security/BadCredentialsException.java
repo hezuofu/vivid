@@ -2,7 +2,7 @@ package org.vividframework.security;
 
 /**
  * Exception thrown for bad credentials
- * @author Jon Fisher
+ * @author sketch
  */
 public class BadCredentialsException extends AuthenticationException {
 

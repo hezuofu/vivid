@@ -24,7 +24,7 @@ import java.util.function.Supplier;
 
 /**
  * Generic application context implementation with full refresh lifecycle.
- * @author Jon Fisher
+ * @author sketch
  */
 public class GenericApplicationContext implements ApplicationContext, BeanDefinitionRegistry {
 

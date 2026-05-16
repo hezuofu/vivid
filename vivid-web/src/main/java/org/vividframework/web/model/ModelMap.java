@@ -4,7 +4,7 @@ import java.util.*;
 
 /**
  * Map-based model implementation (similar to Spring's ModelMap)
- * @author Jon Fisher
+ * @author sketch
  */
 public class ModelMap extends LinkedHashMap<String, Object> {
 

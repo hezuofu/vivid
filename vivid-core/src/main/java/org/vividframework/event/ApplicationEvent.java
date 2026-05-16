@@ -4,7 +4,7 @@ import java.util.EventObject;
 
 /**
  * Base class for application events
- * @author Jon Fisher
+ * @author sketch
  */
 public abstract class ApplicationEvent extends EventObject {
 

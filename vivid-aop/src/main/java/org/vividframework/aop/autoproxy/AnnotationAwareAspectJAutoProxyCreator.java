@@ -15,7 +15,7 @@ import java.lang.reflect.Method;
  * Auto-proxy creator that wraps beans with AOP proxies based on advisor/pointcut configuration.
  * This is a simplified implementation - full AspectJ annotation support would require
  * @Aspect, @Before, @After, @Around annotations processing.
- * @author Jon Fisher
+ * @author sketch
  */
 public class AnnotationAwareAspectJAutoProxyCreator implements BeanPostProcessor {
 

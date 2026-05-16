@@ -6,7 +6,7 @@ import java.util.*;
 
 /**
  * Request mapping information containing path patterns and HTTP methods
- * @author Jon Fisher
+ * @author sketch
  */
 public class RequestMappingInfo {
 

@@ -21,7 +21,7 @@ import java.nio.charset.StandardCharsets;
  *   <li>{@code <name>}      → templates/name.html (default)</li>
  * </ul>
  *
- * @author Jon Fisher
+ * @author sketch
  */
 public class TemplateViewResolver implements ViewResolver {
 

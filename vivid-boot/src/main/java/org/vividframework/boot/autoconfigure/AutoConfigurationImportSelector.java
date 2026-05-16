@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 /**
  * Selects auto-configuration classes to import
- * @author Jon Fisher
+ * @author sketch
  */
 public class AutoConfigurationImportSelector {
 

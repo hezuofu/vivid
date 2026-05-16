@@ -5,7 +5,7 @@ import java.util.List;
 
 /**
  * Authentication manager that delegates to a list of providers
- * @author Jon Fisher
+ * @author sketch
  */
 public class ProviderManager implements AuthenticationManager {
 

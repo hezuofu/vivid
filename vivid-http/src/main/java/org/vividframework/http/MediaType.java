@@ -5,7 +5,7 @@ import java.util.List;
 
 /**
  * HTTP Media Types
- * @author Jon Fisher
+ * @author sketch
  */
 public final class MediaType implements Comparable<MediaType> {
 

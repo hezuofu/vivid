@@ -2,7 +2,7 @@ package org.vividframework.event;
 
 /**
  * Event published after request is handled
- * @author Jon Fisher
+ * @author sketch
  */
 public class RequestHandledEvent extends ApplicationEvent {
 

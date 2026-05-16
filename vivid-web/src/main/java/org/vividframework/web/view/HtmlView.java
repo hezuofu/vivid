@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * HTML view with simple template rendering.
  * Supports {@code {{key}}} placeholders that are replaced with model values.
- * @author Jon Fisher
+ * @author sketch
  */
 public class HtmlView extends View.AbstractView {
 

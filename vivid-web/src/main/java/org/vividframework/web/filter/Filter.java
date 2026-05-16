@@ -5,7 +5,7 @@ import org.vividframework.http.HttpServletResponse;
 
 /**
  * Filter interface for request/response processing chain
- * @author Jon Fisher
+ * @author sketch
  */
 public interface Filter {
 

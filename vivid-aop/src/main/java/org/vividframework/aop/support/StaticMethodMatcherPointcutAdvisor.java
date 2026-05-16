@@ -9,7 +9,7 @@ import java.lang.reflect.Method;
 /**
  * Static method matcher pointcut advisor.
  * Used for advisors that apply to specific methods based on static matching.
- * @author Jon Fisher
+ * @author sketch
  */
 public class StaticMethodMatcherPointcutAdvisor implements Advisor {
 

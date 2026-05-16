@@ -4,7 +4,7 @@ import java.util.*;
 
 /**
  * Ant-style path pattern matcher
- * @author Jon Fisher
+ * @author sketch
  */
 public class AntPathMatcher {
 

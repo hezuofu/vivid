@@ -5,7 +5,7 @@ import org.vividframework.http.HttpServerRequest;
 
 /**
  * Handler adapter interface for executing handlers
- * @author Jon Fisher
+ * @author sketch
  */
 public interface HandlerAdapter {
 

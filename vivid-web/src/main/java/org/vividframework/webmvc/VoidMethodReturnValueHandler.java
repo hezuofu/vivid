@@ -7,7 +7,7 @@ import org.vividframework.http.HttpServerResponse;
 
 /**
  * Handler method return value handler for void return types
- * @author Jon Fisher
+ * @author sketch
  */
 public class VoidMethodReturnValueHandler implements HandlerMethodReturnValueHandler {
 

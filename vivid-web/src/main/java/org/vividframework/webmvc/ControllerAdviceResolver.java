@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Resolver for @ControllerAdvice beans that provide exception handling,
  * binding, and other cross-cutting concerns
- * @author Jon Fisher
+ * @author sketch
  */
 public class ControllerAdviceResolver {
 

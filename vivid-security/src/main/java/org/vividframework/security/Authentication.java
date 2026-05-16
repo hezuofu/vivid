@@ -4,7 +4,7 @@ import java.util.Collection;
 
 /**
  * Authentication interface
- * @author Jon Fisher
+ * @author sketch
  */
 public interface Authentication {
 

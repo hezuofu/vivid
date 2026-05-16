@@ -31,7 +31,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Netty-based HTTP server implementation
- * @author Jon Fisher
+ * @author sketch
  */
 public class NettyHttpServer extends AbstractHttpServer {
 

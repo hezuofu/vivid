@@ -9,7 +9,7 @@ import java.util.*;
 
 /**
  * JDBC template for database operations
- * @author Jon Fisher
+ * @author sketch
  */
 public class JdbcTemplate implements InitializingBean {
 

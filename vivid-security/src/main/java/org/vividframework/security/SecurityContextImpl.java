@@ -2,7 +2,7 @@ package org.vividframework.security;
 
 /**
  * Security context implementation
- * @author Jon Fisher
+ * @author sketch
  */
 public class SecurityContextImpl implements SecurityContext {
 

@@ -4,7 +4,7 @@ import java.lang.reflect.Method;
 
 /**
  * Advisor interface
- * @author Jon Fisher
+ * @author sketch
  */
 public interface Advisor {
 

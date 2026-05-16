@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 /**
  * Helper class for DataSource operations
- * @author Jon Fisher
+ * @author sketch
  */
 public abstract class DataSourceUtils {
 

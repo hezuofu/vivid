@@ -4,7 +4,7 @@ import java.lang.annotation.*;
 
 /**
  * Condition that matches based on property value
- * @author Jon Fisher
+ * @author sketch
  */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

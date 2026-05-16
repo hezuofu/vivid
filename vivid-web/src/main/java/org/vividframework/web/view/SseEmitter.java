@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit;
  * }
  * </pre>
  *
- * @author Jon Fisher
+ * @author sketch
  */
 public class SseEmitter implements View {
 

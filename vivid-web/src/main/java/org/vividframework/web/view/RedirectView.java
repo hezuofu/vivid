@@ -9,7 +9,7 @@ import java.util.Map;
 
 /**
  * Redirect view supporting 301/302/303 redirects with model-to-query propagation.
- * @author Jon Fisher
+ * @author sketch
  */
 public class RedirectView extends View.AbstractView {
 

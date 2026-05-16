@@ -5,7 +5,7 @@ import org.vividframework.http.HttpServerRequest;
 
 /**
  * Filter chain interface for executing filters in order
- * @author Jon Fisher
+ * @author sketch
  */
 public interface FilterChain {
 

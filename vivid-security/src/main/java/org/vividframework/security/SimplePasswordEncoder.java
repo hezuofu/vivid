@@ -6,7 +6,7 @@ import java.security.NoSuchAlgorithmException;
 
 /**
  * Simple password encoder using SHA-256
- * @author Jon Fisher
+ * @author sketch
  */
 public class SimplePasswordEncoder implements PasswordEncoder {
 

@@ -5,7 +5,7 @@ import org.vividframework.web.model.ModelAndView;
 
 /**
  * Handler exception resolver interface
- * @author Jon Fisher
+ * @author sketch
  */
 public interface HandlerExceptionResolver {
 

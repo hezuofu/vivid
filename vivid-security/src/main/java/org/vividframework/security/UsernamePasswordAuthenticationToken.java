@@ -4,7 +4,7 @@ import java.util.Collection;
 
 /**
  * Username password authentication token
- * @author Jon Fisher
+ * @author sketch
  */
 public class UsernamePasswordAuthenticationToken implements Authentication {
 

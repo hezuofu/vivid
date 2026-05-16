@@ -4,7 +4,7 @@ import java.lang.annotation.*;
 
 /**
  * Autowired annotation for dependency injection
- * @author Jon Fisher
+ * @author sketch
  */
 @Target({ElementType.CONSTRUCTOR, ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)

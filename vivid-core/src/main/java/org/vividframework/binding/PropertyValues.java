@@ -4,7 +4,7 @@ import java.util.Iterator;
 
 /**
  * Property values interface
- * @author Jon Fisher
+ * @author sketch
  */
 public interface PropertyValues extends Iterable<PropertyValues.PropertyValue> {
 

@@ -4,7 +4,7 @@ import java.util.Map;
 
 /**
  * Listable bean factory interface
- * @author Jon Fisher
+ * @author sketch
  */
 public interface ListableBeanFactory extends BeanFactory {
 

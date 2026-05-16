@@ -4,7 +4,7 @@ import java.util.function.Supplier;
 
 /**
  * Bean factory interface
- * @author Jon Fisher
+ * @author sketch
  */
 public interface BeanFactory {
 

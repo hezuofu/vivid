@@ -7,7 +7,7 @@ import java.util.Map;
 
 /**
  * Plain text view. Renders model values as text.
- * @author Jon Fisher
+ * @author sketch
  */
 public class TextView extends View.AbstractView {
 

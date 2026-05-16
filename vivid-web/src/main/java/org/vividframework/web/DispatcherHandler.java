@@ -29,7 +29,7 @@ import java.util.Map;
  * Front controller orchestrating the full request processing pipeline:
  * filters → handler mapping → interceptors → handler adapter → view rendering → response.
  * Implements StreamingHttpRequestHandler for SSE/file download support.
- * @author Jon Fisher
+ * @author sketch
  */
 public class DispatcherHandler implements HttpRequestStreamingHandler {
 

@@ -2,7 +2,7 @@ package org.vividframework.boot.properties;
 
 /**
  * Server properties
- * @author Jon Fisher
+ * @author sketch
  */
 public class ServerProperties {
 

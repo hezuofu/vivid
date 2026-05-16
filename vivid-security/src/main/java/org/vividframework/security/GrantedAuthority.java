@@ -2,7 +2,7 @@ package org.vividframework.security;
 
 /**
  * Granted authority interface
- * @author Jon Fisher
+ * @author sketch
  */
 public interface GrantedAuthority {
 

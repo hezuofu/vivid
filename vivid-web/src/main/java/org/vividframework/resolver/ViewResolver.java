@@ -4,7 +4,7 @@ import org.vividframework.web.view.View;
 
 /**
  * View resolver interface
- * @author Jon Fisher
+ * @author sketch
  */
 public interface ViewResolver {
 

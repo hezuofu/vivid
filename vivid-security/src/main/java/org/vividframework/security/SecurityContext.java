@@ -2,7 +2,7 @@ package org.vividframework.security;
 
 /**
  * Security context interface
- * @author Jon Fisher
+ * @author sketch
  */
 public interface SecurityContext {
 

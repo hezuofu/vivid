@@ -3,7 +3,7 @@ package org.vividframework.beans;
 /**
  * BeanFactoryPostProcessor allows modification of bean definitions
  * before any beans are instantiated.
- * @author Jon Fisher
+ * @author sketch
  */
 @FunctionalInterface
 public interface BeanFactoryPostProcessor {

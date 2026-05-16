@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * AOP proxy support
- * @author Jon Fisher
+ * @author sketch
  */
 public interface Advised {
 

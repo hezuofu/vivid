@@ -4,7 +4,7 @@ import java.lang.annotation.*;
 
 /**
  * Annotation for classes that contribute to centralized exception handling
- * @author Jon Fisher
+ * @author sketch
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

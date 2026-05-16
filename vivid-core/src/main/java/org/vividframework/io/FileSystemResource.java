@@ -8,7 +8,7 @@ import java.net.URL;
 
 /**
  * Resource implementation for file system resources
- * @author Jon Fisher
+ * @author sketch
  */
 public class FileSystemResource implements Resource {
 

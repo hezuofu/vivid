@@ -7,7 +7,7 @@ import java.util.Map;
 
 /**
  * Immutable HTTP Response representation
- * @author Jon Fisher
+ * @author sketch
  */
 public final class HttpServletResponse {
 

@@ -4,7 +4,7 @@ import java.lang.annotation.*;
 
 /**
  * Annotation for mapping request header values to method parameters
- * @author Jon Fisher
+ * @author sketch
  */
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)

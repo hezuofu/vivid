@@ -4,7 +4,7 @@ import java.util.EventListener;
 
 /**
  * Application event listener interface
- * @author Jon Fisher
+ * @author sketch
  */
 @FunctionalInterface
 public interface ApplicationListener extends EventListener {

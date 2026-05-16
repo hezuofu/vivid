@@ -5,7 +5,7 @@ import org.vividframework.http.HttpServerRequest;
 
 /**
  * Handler interceptor interface (similar to Spring's HandlerInterceptor)
- * @author Jon Fisher
+ * @author sketch
  */
 public interface HandlerInterceptor {
 

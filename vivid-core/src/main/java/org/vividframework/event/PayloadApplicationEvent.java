@@ -2,7 +2,7 @@ package org.vividframework.event;
 
 /**
  * Application event with payload
- * @author Jon Fisher
+ * @author sketch
  */
 public class PayloadApplicationEvent extends ApplicationEvent {
 

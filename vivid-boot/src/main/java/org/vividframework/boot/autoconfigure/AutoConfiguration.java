@@ -4,7 +4,7 @@ import java.lang.annotation.*;
 
 /**
  * Indicates that the class containing @Configuration can be auto-configured
- * @author Jon Fisher
+ * @author sketch
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

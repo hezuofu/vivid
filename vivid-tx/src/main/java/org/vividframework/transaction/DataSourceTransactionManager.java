@@ -13,7 +13,7 @@ import java.util.Map;
 
 /**
  * DataSource transaction manager
- * @author Jon Fisher
+ * @author sketch
  */
 public class DataSourceTransactionManager implements PlatformTransactionManager, InitializingBean {
 

@@ -4,7 +4,7 @@ import java.lang.reflect.Method;
 
 /**
  * Pointcut interface
- * @author Jon Fisher
+ * @author sketch
  */
 public interface Pointcut {
 

@@ -8,7 +8,7 @@ import org.vividframework.web.view.View;
 
 /**
  * Handler method return value handler for View-based return types
- * @author Jon Fisher
+ * @author sketch
  */
 public class ViewMethodReturnValueHandler implements HandlerMethodReturnValueHandler {
 

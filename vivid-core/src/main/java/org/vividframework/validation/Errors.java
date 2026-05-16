@@ -5,7 +5,7 @@ import java.util.List;
 
 /**
  * Interface for binding and validation errors
- * @author Jon Fisher
+ * @author sketch
  */
 public interface Errors {
 

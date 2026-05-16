@@ -4,7 +4,7 @@ import java.lang.annotation.*;
 
 /**
  * Service annotation
- * @author Jon Fisher
+ * @author sketch
  */
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)

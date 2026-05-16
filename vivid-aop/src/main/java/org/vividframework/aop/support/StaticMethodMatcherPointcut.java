@@ -6,7 +6,7 @@ import java.lang.reflect.Method;
 
 /**
  * Static method matcher pointcut
- * @author Jon Fisher
+ * @author sketch
  */
 public abstract class StaticMethodMatcherPointcut implements Pointcut.MethodMatcher {
 

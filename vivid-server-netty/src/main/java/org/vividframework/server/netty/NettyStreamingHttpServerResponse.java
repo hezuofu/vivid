@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Netty-backed streaming server response.
  * Writes directly to the Netty channel for chunked/streaming responses.
- * @author Jon Fisher
+ * @author sketch
  */
 public class NettyStreamingHttpServerResponse implements StreamingHttpServerResponse {
 

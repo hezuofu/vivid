@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * HTTP message converter for String
- * @author Jon Fisher
+ * @author sketch
  */
 public class StringHttpMessageConverter extends HttpMessageConverter.AbstractHttpMessageConverter<String> {
 

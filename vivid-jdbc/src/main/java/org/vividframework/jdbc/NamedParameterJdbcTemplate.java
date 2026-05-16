@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 /**
  * JDBC template with named parameter support
- * @author Jon Fisher
+ * @author sketch
  */
 public class NamedParameterJdbcTemplate {
 

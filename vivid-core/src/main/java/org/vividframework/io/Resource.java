@@ -8,7 +8,7 @@ import java.net.URL;
 
 /**
  * Resource interface for accessing various input sources
- * @author Jon Fisher
+ * @author sketch
  */
 public interface Resource {
 

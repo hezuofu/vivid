@@ -2,7 +2,7 @@ package org.vividframework.beans;
 
 /**
  * Bean post processor interface for post-processing beans
- * @author Jon Fisher
+ * @author sketch
  */
 public interface BeanPostProcessor {
 
