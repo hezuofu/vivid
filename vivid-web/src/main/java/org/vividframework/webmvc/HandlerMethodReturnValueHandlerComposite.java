@@ -38,11 +38,11 @@ public class HandlerMethodReturnValueHandlerComposite {
     }
 
     /**
-     * Get the handler for the given return type
+     * Get the handler for the given return type and handler method.
      */
-    public HandlerMethodReturnValueHandler getHandler(Class<?> returnType) {
+    public HandlerMethodReturnValueHandler getHandler(HandlerMethod handlerMethod, Class<?> returnType) {
         for (HandlerMethodReturnValueHandler handler : this.handlers) {
-            if (handler.supports(null, returnType)) {
+            if (handler.supports(handlerMethod, returnType)) {
                 return handler;
             }
         }
@@ -50,10 +50,17 @@ public class HandlerMethodReturnValueHandlerComposite {
     }
 
     /**
+     * Get the handler for the given return type only (backward compat).
+     */
+    public HandlerMethodReturnValueHandler getHandler(Class<?> returnType) {
+        return getHandler(null, returnType);
+    }
+
+    /**
      * Check if any handler supports the given return type
      */
-    public boolean hasHandlerFor(Class<?> returnType) {
-        return getHandler(returnType) != null;
+    public boolean hasHandlerFor(HandlerMethod handlerMethod, Class<?> returnType) {
+        return getHandler(handlerMethod, returnType) != null;
     }
 
     /**
@@ -62,7 +69,7 @@ public class HandlerMethodReturnValueHandlerComposite {
     public void handleReturnValue(HandlerMethod handlerMethod, HttpServerRequest request,
                                   HttpServerResponse response, Object returnValue) throws Exception {
         Class<?> returnType = returnValue != null ? returnValue.getClass() : void.class;
-        HandlerMethodReturnValueHandler handler = getHandler(returnType);
+        HandlerMethodReturnValueHandler handler = getHandler(handlerMethod, returnType);
 
         if (handler == null) {
             throw new IllegalStateException(

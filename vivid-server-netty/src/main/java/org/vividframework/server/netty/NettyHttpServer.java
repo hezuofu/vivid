@@ -191,6 +191,7 @@ public class NettyHttpServer extends AbstractHttpServer {
                     .method(method)
                     .uri(request.uri())
                     .headers(vfHeaders)
+                    .body(body)
                     .queryParams(queryParams)
                     .cookies(cookies)
                     .remoteAddress(remote != null ? remote.getAddress().getHostAddress() : null)

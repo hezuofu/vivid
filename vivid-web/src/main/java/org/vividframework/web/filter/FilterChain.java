@@ -88,24 +88,37 @@ public interface FilterChain {
     }
 
     /**
-     * Default filter chain implementation
+     * Default filter chain implementation.
      */
     class DefaultFilterChain implements FilterChain {
         private final java.util.List<Filter> filters;
         private int index = 0;
+        private final java.util.function.Function<HttpServerRequest, HttpServletResponse> terminalHandler;
 
         public DefaultFilterChain(java.util.List<Filter> filters) {
+            this(filters, null);
+        }
+
+        /**
+         * Create a filter chain with a terminal handler called when the chain is exhausted.
+         */
+        public DefaultFilterChain(java.util.List<Filter> filters,
+                                   java.util.function.Function<HttpServerRequest, HttpServletResponse> terminalHandler) {
             this.filters = new java.util.ArrayList<>(filters);
             this.filters.sort((f1, f2) -> {
                 int o1 = f1.getOrder();
                 int o2 = f2.getOrder();
                 return Integer.compare(o1, o2);
             });
+            this.terminalHandler = terminalHandler;
         }
 
         @Override
         public HttpServletResponse doFilter(HttpServerRequest request) throws Exception {
             if (index >= filters.size()) {
+                if (terminalHandler != null) {
+                    return terminalHandler.apply(request);
+                }
                 throw new IllegalStateException("Filter chain exhausted without response");
             }
             Filter filter = filters.get(index++);

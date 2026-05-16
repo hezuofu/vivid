@@ -1,29 +1,30 @@
 package org.vividframework.webmvc;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.vividframework.web.handler.HandlerMethod;
-import org.vividframework.http.HttpServletResponse;
 import org.vividframework.http.HttpServerRequest;
-import org.vividframework.http.HttpServerResponse;
 import org.vividframework.web.annotation.RequestBody;
 
-import java.io.IOException;
-import java.io.Reader;
+import java.lang.reflect.Parameter;
 import java.nio.charset.StandardCharsets;
 
 /**
- * Resolver for @RequestBody annotated method parameters
+ * Resolver for @RequestBody annotated method parameters.
+ * Uses Jackson for JSON deserialization.
  * @author Jon Fisher
  */
 public class RequestBodyMethodArgumentResolver implements HandlerMethodArgumentResolver {
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     @Override
-    public boolean supports(HandlerMethod handlerMethod, java.lang.reflect.Parameter parameter) {
+    public boolean supports(HandlerMethod handlerMethod, Parameter parameter) {
         return parameter.isAnnotationPresent(RequestBody.class);
     }
 
     @Override
     public Object resolveArgument(HandlerMethod handlerMethod, HttpServerRequest request,
-                                   java.lang.reflect.Parameter parameter) throws Exception {
+                                   Parameter parameter) throws Exception {
         Class<?> parameterType = parameter.getType();
         byte[] content = request.getContent();
 
@@ -31,26 +32,14 @@ public class RequestBodyMethodArgumentResolver implements HandlerMethodArgumentR
             return null;
         }
 
-        String body = new String(content, StandardCharsets.UTF_8);
-        return convertToType(body, parameterType);
-    }
-
-    private Object convertToType(String body, Class<?> parameterType) {
         if (parameterType == String.class) {
-            return body;
-        } else if (parameterType == byte[].class) {
-            return body.getBytes(StandardCharsets.UTF_8);
-        } else if (parameterType == int.class || parameterType == Integer.class) {
-            return Integer.parseInt(body.trim());
-        } else if (parameterType == long.class || parameterType == Long.class) {
-            return Long.parseLong(body.trim());
-        } else if (parameterType == double.class || parameterType == Double.class) {
-            return Double.parseDouble(body.trim());
-        } else if (parameterType == boolean.class || parameterType == Boolean.class) {
-            return Boolean.parseBoolean(body.trim());
+            return new String(content, StandardCharsets.UTF_8);
         }
-        // For complex types, assume JSON and return as string for now
-        // In a full implementation, this would use Jackson ObjectMapper
-        return body;
+        if (parameterType == byte[].class) {
+            return content;
+        }
+
+        // Use Jackson for complex types
+        return objectMapper.readValue(content, parameterType);
     }
 }

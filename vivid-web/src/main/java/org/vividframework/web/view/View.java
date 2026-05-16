@@ -19,10 +19,19 @@ public interface View {
     String getContentType();
 
     /**
+     * Render the view into an HttpServletResponse.Builder.
+     * This is the primary render method used by the DispatcherHandler.
+     */
+    default void render(Map<String, ?> model, HttpServerRequest request, HttpServletResponse.Builder builder) throws Exception {
+        HttpServletResponse response = builder.build();
+        render(model, request, response);
+        // The builder is consumed — implementations should use builder directly for efficiency
+    }
+
+    /**
      * Render the view with HttpServerResponse (for internal Netty server use)
      */
     default void render(Map<String, ?> model, HttpServerRequest request, HttpServerResponse response) throws Exception {
-        // Default implementation: convert HttpServerResponse to HttpServletResponse if needed
         if (response != null) {
             render(model, request, response.toImmutable());
         }

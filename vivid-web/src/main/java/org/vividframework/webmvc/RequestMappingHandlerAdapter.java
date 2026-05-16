@@ -96,7 +96,7 @@ public class RequestMappingHandlerAdapter implements HandlerAdapter {
         }
 
         // For @ResponseBody methods, the return value is handled differently
-        HandlerMethodReturnValueHandler handler = this.returnValueHandlers.getHandler(returnType);
+        HandlerMethodReturnValueHandler handler = this.returnValueHandlers.getHandler(handlerMethod, returnType);
         if (handler != null) {
             HttpServerResponse response = HttpServerResponse.from(() -> HttpServletResponse.ok());
             handler.handleReturnValue(handlerMethod, request, response, returnValue);

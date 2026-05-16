@@ -10,6 +10,7 @@ import org.vividframework.beans.scanner.ClassPathBeanDefinitionScanner;
 import org.vividframework.context.GenericApplicationContext;
 import org.vividframework.web.DispatcherHandler;
 import org.vividframework.web.RequestMappingHandlerMapping;
+import org.vividframework.webmvc.RequestMappingHandlerAdapter;
 import org.vividframework.server.netty.NettyHttpServer;
 import org.vividframework.server.AbstractHttpServer;
 import org.vividframework.web.resolver.ViewResolver;
@@ -97,7 +98,10 @@ public class SpringApplication {
     }
 
     protected void prepareContext(GenericApplicationContext context) {
-        // Register web handler
+        // Register web components BEFORE dispatcher (so it can find them)
+        registerWebComponents(context);
+
+        // Register web handler (depends on web components being registered)
         registerDispatcherHandler(context);
 
         // Load auto-configurations
@@ -106,11 +110,8 @@ public class SpringApplication {
         // Scan and register beans
         scanAndRegisterBeans(context);
 
-        // Register web components
-        registerWebComponents(context);
-
         // Add event publisher
-        ApplicationEventPublisher.SimpleApplicationEventPublisher eventPublisher = 
+        ApplicationEventPublisher.SimpleApplicationEventPublisher eventPublisher =
             new ApplicationEventPublisher.SimpleApplicationEventPublisher();
         context.registerBeanDefinition("eventPublisher",
                 createBeanDefinition(ApplicationEventPublisher.SimpleApplicationEventPublisher.class, eventPublisher));
@@ -212,6 +213,11 @@ public class SpringApplication {
         RequestMappingHandlerMapping handlerMapping = new RequestMappingHandlerMapping(context);
         context.registerBeanDefinition("requestMappingHandlerMapping",
                 createBeanDefinition(RequestMappingHandlerMapping.class, handlerMapping));
+
+        // Register handler adapter
+        RequestMappingHandlerAdapter handlerAdapter = new RequestMappingHandlerAdapter();
+        context.registerBeanDefinition("requestMappingHandlerAdapter",
+                createBeanDefinition(RequestMappingHandlerAdapter.class, handlerAdapter));
 
         // Register view resolvers
         ViewResolver jsonViewResolver = viewName -> {

@@ -1,5 +1,6 @@
 package org.vividframework.webmvc;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.vividframework.web.handler.HandlerMethod;
 import org.vividframework.http.HttpServletResponse;
 import org.vividframework.http.HttpServerRequest;
@@ -8,13 +9,19 @@ import org.vividframework.web.model.ModelAndView;
 import org.vividframework.web.annotation.ResponseBody;
 
 /**
- * Handler method return value handler for @ResponseBody annotated methods
+ * Handler method return value handler for @ResponseBody annotated methods.
+ * Uses Jackson for JSON serialization.
  * @author Jon Fisher
  */
 public class RequestResponseBodyMethodProcessor implements HandlerMethodReturnValueHandler {
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     @Override
     public boolean supports(HandlerMethod handlerMethod, Class<?> returnType) {
+        if (handlerMethod == null) {
+            return false;
+        }
         return handlerMethod.hasMethodAnnotation(ResponseBody.class) ||
                handlerMethod.getBeanType().isAnnotationPresent(ResponseBody.class);
     }
@@ -26,21 +33,17 @@ public class RequestResponseBodyMethodProcessor implements HandlerMethodReturnVa
             return;
         }
 
-        HttpServletResponse.Builder builder = HttpServletResponse.builder();
-
-        if (returnValue instanceof String) {
-            builder.text((String) returnValue);
+        if (returnValue instanceof String || returnValue instanceof CharSequence) {
+            String text = returnValue.toString();
+            response.body(text.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        } else if (returnValue instanceof byte[]) {
+            response.body((byte[]) returnValue);
         } else if (returnValue instanceof HttpServletResponse) {
             HttpServletResponse r = (HttpServletResponse) returnValue;
-            builder.status(r.getStatus())
-                   .headers(r.getHeaders())
-                   .content(r.getContent());
-        } else if (returnValue instanceof CharSequence) {
-            builder.text(returnValue.toString());
+            response.body(r.getContent());
         } else {
-            builder.json(returnValue.toString());
+            byte[] json = objectMapper.writeValueAsBytes(returnValue);
+            response.body(json);
         }
-
-        response.body(builder.build().getContent());
     }
 }

@@ -144,6 +144,26 @@ public final class HttpRequest implements HttpServerRequest {
     }
 
     @Override
+    public Map<String, String> getPathVariables() {
+        Map<String, String> result = new LinkedHashMap<>();
+        for (Map.Entry<String, List<String>> entry : pathParams.entrySet()) {
+            if (!entry.getValue().isEmpty()) {
+                result.put(entry.getKey(), entry.getValue().get(0));
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Set path variables after request construction (used by handler mapping).
+     */
+    public void setPathVariables(Map<String, String> vars) {
+        for (Map.Entry<String, String> entry : vars.entrySet()) {
+            pathParams.put(entry.getKey(), List.of(entry.getValue()));
+        }
+    }
+
+    @Override
     public String getHeader(String name) {
         return headers.getFirst(name);
     }
@@ -343,7 +363,7 @@ public final class HttpRequest implements HttpServerRequest {
         private HttpHeaders headers = new HttpHeaders();
         private byte[] body;
         private Map<String, List<String>> queryParams = Map.of();
-        private Map<String, List<String>> pathParams = Map.of();
+        private Map<String, List<String>> pathParams = new HashMap<>();
         private Map<String, String> cookies = Map.of();
         private String remoteAddress;
         private String localAddress;

@@ -50,7 +50,14 @@ public class HandlerExecutionChain {
     }
 
     /**
-     * Apply pre-handle interceptors
+     * Apply pre-handle interceptors.
+     */
+    public boolean applyPreHandle(HttpServerRequest request) throws Exception {
+        return applyPreHandle(request, null);
+    }
+
+    /**
+     * Apply pre-handle interceptors with response.
      */
     boolean applyPreHandle(HttpServerRequest request, HttpServletResponse response) throws Exception {
         for (int i = 0; i < interceptorList.size(); i++) {
@@ -65,7 +72,14 @@ public class HandlerExecutionChain {
     }
 
     /**
-     * Apply post-handle interceptors
+     * Apply post-handle interceptors.
+     */
+    public void applyPostHandle(HttpServerRequest request, Object result) throws Exception {
+        applyPostHandle(request, null, result);
+    }
+
+    /**
+     * Apply post-handle interceptors with response.
      */
     void applyPostHandle(HttpServerRequest request, HttpServletResponse response, Object modelAndView) throws Exception {
         for (int i = interceptorList.size() - 1; i >= 0; i--) {
@@ -75,7 +89,14 @@ public class HandlerExecutionChain {
     }
 
     /**
-     * Trigger after completion callbacks
+     * Trigger after completion callbacks.
+     */
+    public void triggerAfterCompletion(HttpServerRequest request, Exception ex) {
+        triggerAfterCompletion(request, null, ex);
+    }
+
+    /**
+     * Trigger after completion callbacks with response.
      */
     void triggerAfterCompletion(HttpServerRequest request, HttpServletResponse response, Exception ex) {
         for (int i = Math.min(interceptorIndex, interceptorList.size() - 1); i >= 0; i--) {
