@@ -24,6 +24,7 @@
         <module>vivid-jdbc</module>
         <module>vivid-tx</module>
         <module>vivid-security</module>
+        <module>vivid-samples</module>
     </modules>
 
     <properties>
@@ -95,6 +96,11 @@
             <dependency>
                 <groupId>org.vividframework</groupId>
                 <artifactId>vivid-security</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.vividframework</groupId>
+                <artifactId>vivid-samples</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

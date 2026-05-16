@@ -13,9 +13,13 @@ import org.vividframework.web.RequestMappingHandlerMapping;
 import org.vividframework.webmvc.RequestMappingHandlerAdapter;
 import org.vividframework.server.netty.NettyHttpServer;
 import org.vividframework.server.AbstractHttpServer;
+import org.vividframework.web.resolver.TemplateViewResolver;
 import org.vividframework.web.resolver.ViewResolver;
+import org.vividframework.web.view.HtmlView;
 import org.vividframework.web.view.JsonView;
 import org.vividframework.web.view.RedirectView;
+import org.vividframework.web.view.TextView;
+import org.vividframework.web.view.XmlView;
 import org.vividframework.event.ApplicationEventPublisher;
 import org.vividframework.config.Environment;
 
@@ -219,7 +223,16 @@ public class SpringApplication {
         context.registerBeanDefinition("requestMappingHandlerAdapter",
                 createBeanDefinition(RequestMappingHandlerAdapter.class, handlerAdapter));
 
-        // Register view resolvers
+        // Register view resolvers (in priority order: prefix-based first, then template)
+        ViewResolver redirectViewResolver = viewName -> {
+            if (viewName != null && viewName.startsWith("redirect:")) {
+                return new RedirectView(viewName.substring(9));
+            }
+            return null;
+        };
+        context.registerBeanDefinition("redirectViewResolver",
+                createBeanDefinition(ViewResolver.class, redirectViewResolver));
+
         ViewResolver jsonViewResolver = viewName -> {
             if (viewName != null && viewName.startsWith("json:")) {
                 return new JsonView();
@@ -229,14 +242,38 @@ public class SpringApplication {
         context.registerBeanDefinition("jsonViewResolver",
                 createBeanDefinition(ViewResolver.class, jsonViewResolver));
 
-        ViewResolver redirectViewResolver = viewName -> {
-            if (viewName != null && viewName.startsWith("redirect:")) {
-                return new RedirectView(viewName.substring(9));
+        // Inline prefix view resolvers for html:/text:/xml:
+        ViewResolver htmlViewResolver = viewName -> {
+            if (viewName != null && viewName.startsWith("html:")) {
+                return new HtmlView(viewName.substring(5));
             }
             return null;
         };
-        context.registerBeanDefinition("redirectViewResolver",
-                createBeanDefinition(ViewResolver.class, redirectViewResolver));
+        context.registerBeanDefinition("htmlViewResolver",
+                createBeanDefinition(ViewResolver.class, htmlViewResolver));
+
+        ViewResolver textViewResolver = viewName -> {
+            if (viewName != null && viewName.startsWith("text:")) {
+                return new TextView(viewName.substring(5));
+            }
+            return null;
+        };
+        context.registerBeanDefinition("textViewResolver",
+                createBeanDefinition(ViewResolver.class, textViewResolver));
+
+        ViewResolver xmlViewResolver = viewName -> {
+            if (viewName != null && viewName.startsWith("xml:")) {
+                return new XmlView(viewName.substring(4));
+            }
+            return null;
+        };
+        context.registerBeanDefinition("xmlViewResolver",
+                createBeanDefinition(ViewResolver.class, xmlViewResolver));
+
+        // Template file resolver (falls through for non-prefixed names)
+        TemplateViewResolver templateResolver = new TemplateViewResolver();
+        context.registerBeanDefinition("templateViewResolver",
+                createBeanDefinition(TemplateViewResolver.class, templateResolver));
     }
 
     protected String getBasePackage(Class<?> clazz) {
