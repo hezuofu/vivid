@@ -1,11 +1,11 @@
 package org.vividframework.web;
 
-import org.vividframework.handler.HandlerExecutionChain;
-import org.vividframework.handler.HandlerMethod;
-import org.vividframework.mapping.HandlerMapping.AbstractHandlerMapping;
-import org.vividframework.mapping.RequestMappingInfo;
+import org.vividframework.web.handler.HandlerExecutionChain;
+import org.vividframework.web.handler.HandlerMethod;
+import org.vividframework.web.mapping.HandlerMapping.AbstractHandlerMapping;
+import org.vividframework.web.mapping.RequestMappingInfo;
 import org.vividframework.http.HttpMethod;
-import org.vividframework.http.server.HttpServerRequest;
+import org.vividframework.http.HttpServerRequest;
 import org.vividframework.context.GenericApplicationContext;
 import org.vividframework.beans.annotation.Controller;
 import org.vividframework.web.annotation.RequestMapping;

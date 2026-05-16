@@ -14,11 +14,12 @@
 
     <modules>
         <module>vivid-core</module>
+        <module>vivid-http</module>
+        <module>vivid-server-netty</module>
         <module>vivid-beans</module>
         <module>vivid-context</module>
         <module>vivid-aop</module>
         <module>vivid-web</module>
-        <module>vivid-webmvc</module>
         <module>vivid-boot</module>
         <module>vivid-jdbc</module>
         <module>vivid-tx</module>
@@ -48,6 +49,16 @@
             </dependency>
             <dependency>
                 <groupId>org.vividframework</groupId>
+                <artifactId>vivid-http</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.vividframework</groupId>
+                <artifactId>vivid-server-netty</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.vividframework</groupId>
                 <artifactId>vivid-beans</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -64,11 +75,6 @@
             <dependency>
                 <groupId>org.vividframework</groupId>
                 <artifactId>vivid-web</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.vividframework</groupId>
-                <artifactId>vivid-webmvc</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

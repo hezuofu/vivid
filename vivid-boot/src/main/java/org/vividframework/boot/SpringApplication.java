@@ -10,11 +10,11 @@ import org.vividframework.beans.scanner.ClassPathBeanDefinitionScanner;
 import org.vividframework.context.GenericApplicationContext;
 import org.vividframework.web.DispatcherHandler;
 import org.vividframework.web.RequestMappingHandlerMapping;
-import org.vividframework.http.server.NettyHttpServer;
-import org.vividframework.http.server.AbstractHttpServer;
-import org.vividframework.resolver.ViewResolver;
-import org.vividframework.view.JsonView;
-import org.vividframework.view.RedirectView;
+import org.vividframework.server.netty.NettyHttpServer;
+import org.vividframework.server.AbstractHttpServer;
+import org.vividframework.web.resolver.ViewResolver;
+import org.vividframework.web.view.JsonView;
+import org.vividframework.web.view.RedirectView;
 import org.vividframework.event.ApplicationEventPublisher;
 import org.vividframework.config.Environment;
 

@@ -1,7 +1,7 @@
-package org.vividframework.resolver;
+package org.vividframework.web.resolver;
 
-import org.vividframework.http.server.HttpServerRequest;
-import org.vividframework.model.ModelAndView;
+import org.vividframework.http.HttpServerRequest;
+import org.vividframework.web.model.ModelAndView;
 
 /**
  * Handler exception resolver interface

@@ -4,16 +4,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vividframework.context.GenericApplicationContext;
 import org.vividframework.http.HttpServletResponse;
-import org.vividframework.http.server.HttpServerRequest;
-import org.vividframework.mapping.HandlerMapping;
-import org.vividframework.mapping.HandlerMapping.AbstractHandlerMapping;
-import org.vividframework.handler.HandlerAdapter;
-import org.vividframework.handler.HandlerExecutionChain;
-import org.vividframework.handler.HandlerMethod;
-import org.vividframework.mapping.HandlerMapping.SimpleUrlHandlerMapping;
-import org.vividframework.model.ModelAndView;
-import org.vividframework.resolver.HandlerExceptionResolver;
-import org.vividframework.resolver.ViewResolver;
+import org.vividframework.http.HttpServerRequest;
+import org.vividframework.web.mapping.HandlerMapping;
+import org.vividframework.web.mapping.HandlerMapping.AbstractHandlerMapping;
+import org.vividframework.web.handler.HandlerAdapter;
+import org.vividframework.web.handler.HandlerExecutionChain;
+import org.vividframework.web.handler.HandlerMethod;
+import org.vividframework.web.mapping.HandlerMapping.SimpleUrlHandlerMapping;
+import org.vividframework.web.model.ModelAndView;
+import org.vividframework.web.resolver.HandlerExceptionResolver;
+import org.vividframework.web.resolver.ViewResolver;
 import org.vividframework.event.RequestHandledEvent;
 import org.vividframework.event.ApplicationEventPublisher;
 
@@ -184,14 +184,14 @@ public class DispatcherHandler {
         }
 
         if (view != null) {
-            org.vividframework.view.View v = (org.vividframework.view.View) view;
+            org.vividframework.web.view.View v = (org.vividframework.web.view.View) view;
             v.render(modelAndView.getModel(), request, (HttpServletResponse) null);
         }
     }
 
     protected Object resolveViewName(String viewName) throws Exception {
         for (ViewResolver resolver : viewResolvers) {
-            org.vividframework.view.View view = resolver.resolveViewName(viewName);
+            org.vividframework.web.view.View view = resolver.resolveViewName(viewName);
             if (view != null) {
                 return view;
             }

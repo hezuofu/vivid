@@ -19,7 +19,7 @@
     <dependencies>
         <dependency>
             <groupId>org.vividframework</groupId>
-            <artifactId>vivid-webmvc</artifactId>
+            <artifactId>vivid-server-netty</artifactId>
         </dependency>
         <dependency>
             <groupId>org.vividframework</groupId>

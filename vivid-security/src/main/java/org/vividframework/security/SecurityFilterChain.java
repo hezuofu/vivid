@@ -1,8 +1,8 @@
 package org.vividframework.security;
 
-import org.vividframework.filter.Filter;
-import org.vividframework.http.server.HttpServerRequest;
-import org.vividframework.http.server.HttpServerResponse;
+import org.vividframework.web.filter.Filter;
+import org.vividframework.http.HttpServerRequest;
+import org.vividframework.http.HttpServerResponse;
 
 import java.util.ArrayList;
 import java.util.List;

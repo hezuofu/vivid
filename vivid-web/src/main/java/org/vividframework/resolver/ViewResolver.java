@@ -1,6 +1,6 @@
-package org.vividframework.resolver;
+package org.vividframework.web.resolver;
 
-import org.vividframework.view.View;
+import org.vividframework.web.view.View;
 
 /**
  * View resolver interface

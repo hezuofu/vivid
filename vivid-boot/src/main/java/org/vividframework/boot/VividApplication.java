@@ -3,7 +3,7 @@ package org.vividframework.boot;
 import org.vividframework.context.GenericApplicationContext;
 import org.vividframework.beans.DefaultListableBeanFactory;
 import org.vividframework.web.DispatcherHandler;
-import org.vividframework.http.server.NettyHttpServer;
+import org.vividframework.server.netty.NettyHttpServer;
 
 import java.util.Properties;
 

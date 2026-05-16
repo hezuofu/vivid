@@ -1,14 +1,14 @@
 package org.vividframework.security;
 
 import org.vividframework.http.HttpServletResponse;
-import org.vividframework.http.server.HttpServerRequest;
-import org.vividframework.http.server.HttpServerResponse;
+import org.vividframework.http.HttpServerRequest;
+import org.vividframework.http.HttpServerResponse;
 
 /**
  * Security filter for authentication
  * @author Jon Fisher
  */
-public class AuthenticationFilter implements org.vividframework.filter.Filter {
+public class AuthenticationFilter implements org.vividframework.web.filter.Filter {
 
     private AuthenticationManager authenticationManager;
     private boolean ignoreFailure = false;
@@ -22,7 +22,7 @@ public class AuthenticationFilter implements org.vividframework.filter.Filter {
 
     @Override
     public HttpServletResponse doFilter(HttpServerRequest request,
-                                        org.vividframework.filter.FilterChain chain) throws Exception {
+                                        org.vividframework.web.filter.FilterChain chain) throws Exception {
         // Check if authentication is required
         Authentication existingAuth = SecurityContextHolder.getContext().getAuthentication();
         
