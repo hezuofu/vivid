@@ -3,8 +3,10 @@ package org.vividframework.web;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vividframework.context.GenericApplicationContext;
+import org.vividframework.http.HttpRequestStreamingHandler;
 import org.vividframework.http.HttpServletResponse;
 import org.vividframework.http.HttpServerRequest;
+import org.vividframework.http.StreamingHttpServerResponse;
 import org.vividframework.web.filter.Filter;
 import org.vividframework.web.filter.FilterChain;
 import org.vividframework.web.handler.HandlerAdapter;
@@ -26,9 +28,10 @@ import java.util.Map;
 /**
  * Front controller orchestrating the full request processing pipeline:
  * filters → handler mapping → interceptors → handler adapter → view rendering → response.
+ * Implements StreamingHttpRequestHandler for SSE/file download support.
  * @author Jon Fisher
  */
-public class DispatcherHandler {
+public class DispatcherHandler implements HttpRequestStreamingHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(DispatcherHandler.class);
 
@@ -99,7 +102,53 @@ public class DispatcherHandler {
     }
 
     /**
-     * Handle a request through the full pipeline.
+     * Handle a streaming request. Used for SSE, file downloads, etc.
+     */
+    @Override
+    public void handle(HttpServerRequest request, StreamingHttpServerResponse response) throws Exception {
+        long startTime = System.currentTimeMillis();
+        Exception handlerException = null;
+        Object handler = null;
+        HandlerExecutionChain executionChain = null;
+
+        try {
+            handler = getHandler(request);
+            if (handler == null) {
+                response.status(404).body("No handler found");
+                response.complete();
+                return;
+            }
+
+            executionChain = getHandlerExecutionChain(handler, request);
+
+            if (!executionChain.applyPreHandle(request)) {
+                response.status(403).body("Request blocked by interceptor");
+                response.complete();
+                return;
+            }
+
+            HandlerAdapter adapter = getHandlerAdapter(handler);
+            Object result = adapter.handle(request, handler);
+
+            processStreamingResult(result, request, response);
+
+            executionChain.applyPostHandle(request, result);
+            executionChain.triggerAfterCompletion(request, null);
+
+        } catch (Exception e) {
+            handlerException = e;
+            try {
+                response.status(500).body("Error: " + e.getMessage());
+            } catch (Exception ignored) {}
+            response.complete();
+        } finally {
+            long processingTime = System.currentTimeMillis() - startTime;
+            publishRequestHandledEvent(request, processingTime, handler, handlerException);
+        }
+    }
+
+    /**
+     * Handle a request through the full pipeline (buffered mode).
      */
     public HttpServletResponse handle(HttpServerRequest request) throws Exception {
         long startTime = System.currentTimeMillis();
@@ -191,6 +240,37 @@ public class DispatcherHandler {
         chain.triggerAfterCompletion(request, null);
 
         return response;
+    }
+
+    /**
+     * Process handler result with streaming support.
+     * If the result is a streaming view, renders it directly to the response.
+     */
+    protected void processStreamingResult(Object result, HttpServerRequest request,
+                                           StreamingHttpServerResponse response) throws Exception {
+        if (result instanceof View view && view.isStreaming()) {
+            view.renderStreaming(null, request, response);
+            return;
+        }
+
+        // For buffered views or other results, render via the standard path
+        if (result instanceof ModelAndView mav) {
+            Object viewObj = mav.getView();
+            if (viewObj instanceof View view && view.isStreaming()) {
+                view.renderStreaming(mav.getModel(), request, response);
+                return;
+            }
+        }
+
+        // Fall back to buffered rendering
+        HttpServletResponse httpResponse = processHandlerResult(result, request);
+        response.status(httpResponse.getStatus());
+        response.getHeaders().addAll(httpResponse.getHeaders());
+        byte[] body = httpResponse.getContent();
+        if (body != null && body.length > 0) {
+            response.getOutputStream().write(body);
+        }
+        response.complete();
     }
 
     /**

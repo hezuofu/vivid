@@ -243,6 +243,18 @@ public final class HttpHeaders implements Iterable<String> {
         return this;
     }
 
+    /**
+     * Add all headers from another HttpHeaders instance.
+     */
+    public HttpHeaders addAll(HttpHeaders other) {
+        for (String name : other.keySet()) {
+            for (String value : other.get(name)) {
+                add(name, value);
+            }
+        }
+        return this;
+    }
+
     public HttpHeaders addContentLength(long contentLength) {
         add(CONTENT_LENGTH, String.valueOf(contentLength));
         return this;

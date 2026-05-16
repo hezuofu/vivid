@@ -117,10 +117,18 @@ public class NettyHttpServer extends AbstractHttpServer {
     }
 
     /**
-     * Dispatch request to handler (public wrapper for protected handleRequest)
+     * Dispatch request to handler (public wrapper for protected handleRequest).
      */
     public HttpServletResponse dispatchRequest(HttpServerRequest request) {
         return handleRequest(request);
+    }
+
+    /**
+     * Dispatch streaming request to handler.
+     */
+    public void dispatchStreamingRequest(HttpServerRequest request,
+                                          org.vividframework.http.StreamingHttpServerResponse response) {
+        handleStreamingRequest(request, response);
     }
 
     private class NettyServerHandler extends ChannelInboundHandlerAdapter {
@@ -137,8 +145,16 @@ public class NettyHttpServer extends AbstractHttpServer {
         private void handleRequest(ChannelHandlerContext ctx, FullHttpRequest request) {
             try {
                 HttpServerRequest serverRequest = convertRequest(request, ctx);
-                HttpServletResponse response = NettyHttpServer.this.dispatchRequest(serverRequest);
-                writeResponse(ctx, request, response);
+
+                // Use streaming mode if handler supports it
+                if (NettyHttpServer.this.handler instanceof org.vividframework.http.HttpRequestStreamingHandler streamingHandler) {
+                    NettyStreamingHttpServerResponse streamingResponse =
+                            new NettyStreamingHttpServerResponse(ctx, request);
+                    NettyHttpServer.this.dispatchStreamingRequest(serverRequest, streamingResponse);
+                } else {
+                    HttpServletResponse response = NettyHttpServer.this.dispatchRequest(serverRequest);
+                    writeResponse(ctx, request, response);
+                }
             } catch (Exception e) {
                 logger.error("Error handling request", e);
                 writeErrorResponse(ctx, request, 500, e.getMessage());

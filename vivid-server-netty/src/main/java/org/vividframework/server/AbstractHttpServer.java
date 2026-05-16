@@ -155,6 +155,38 @@ public abstract class AbstractHttpServer implements HttpServer {
     }
 
     /**
+     * Handle a request with streaming support.
+     */
+    protected void handleStreamingRequest(HttpServerRequest request,
+                                           org.vividframework.http.StreamingHttpServerResponse response) {
+        if (handler instanceof org.vividframework.http.HttpRequestStreamingHandler streamingHandler) {
+            try {
+                streamingHandler.handle(request, response);
+            } catch (Exception e) {
+                logger.error("Error handling streaming request: {}", request.getPath(), e);
+                try {
+                    response.status(500).body("Internal Server Error: " + e.getMessage());
+                    response.complete();
+                } catch (Exception ignored) {}
+            }
+        } else {
+            // Fall back to buffered
+            HttpServletResponse httpResponse = handleRequest(request);
+            try {
+                response.status(httpResponse.getStatus());
+                response.getHeaders().addAll(httpResponse.getHeaders());
+                byte[] body = httpResponse.getContent();
+                if (body != null && body.length > 0) {
+                    response.getOutputStream().write(body);
+                }
+                response.complete();
+            } catch (Exception e) {
+                logger.error("Error writing response", e);
+            }
+        }
+    }
+
+    /**
      * Template method for starting the server
      */
     protected abstract void doStart() throws Exception;

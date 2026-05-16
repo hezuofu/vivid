@@ -69,12 +69,12 @@ public interface HttpServer {
     }
 
     /**
-     * HTTP Request Handler interface
+     * HTTP Request Handler interface.
      */
     @FunctionalInterface
     interface HttpRequestHandler {
         /**
-         * Handle an HTTP request
+         * Handle an HTTP request.
          * @param request The request context
          * @return The response
          */
@@ -82,12 +82,34 @@ public interface HttpServer {
     }
 
     /**
-     * Async HTTP Request Handler interface
+     * Streaming-aware request handler.
+     * Implemented by handlers that can write streaming responses directly.
+     */
+    interface StreamingHttpRequestHandler extends HttpRequestHandler {
+        /**
+         * Handle a request with streaming support.
+         * Default implementation delegates to buffered handler.
+         */
+        default void handle(HttpServerRequest request, org.vividframework.http.StreamingHttpServerResponse response)
+                throws Exception {
+            HttpServletResponse httpResponse = handle(request);
+            response.status(httpResponse.getStatus());
+            response.getHeaders().addAll(httpResponse.getHeaders());
+            byte[] content = httpResponse.getContent();
+            if (content != null && content.length > 0) {
+                response.getOutputStream().write(content);
+            }
+            response.complete();
+        }
+    }
+
+    /**
+     * Async HTTP Request Handler interface.
      */
     @FunctionalInterface
     interface AsyncHttpRequestHandler {
         /**
-         * Handle an HTTP request asynchronously
+         * Handle an HTTP request asynchronously.
          * @param request The request context
          * @param callback The callback to invoke with the response
          */

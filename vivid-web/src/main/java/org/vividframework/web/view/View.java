@@ -3,34 +3,75 @@ package org.vividframework.web.view;
 import org.vividframework.http.HttpServletResponse;
 import org.vividframework.http.HttpServerRequest;
 import org.vividframework.http.HttpServerResponse;
-import org.vividframework.web.model.ModelMap;
+import org.vividframework.http.StreamingHttpServerResponse;
 
 import java.util.Map;
 
 /**
- * View interface for rendering content
+ * View interface with unified support for both buffered and streaming rendering.
+ *
+ * Buffered views (JsonView, RedirectView, etc.) render into a builder.
+ * Streaming views (FileView, SseView) write directly to an output stream.
+ *
  * @author Jon Fisher
  */
 public interface View {
 
     /**
-     * Get content type
+     * Get content type for this view.
      */
     String getContentType();
 
     /**
-     * Render the view into an HttpServletResponse.Builder.
-     * This is the primary render method used by the DispatcherHandler.
+     * Whether this view uses streaming mode (chunked transfer).
+     * Streaming views are rendered via {@link #renderStreaming} instead of {@link #render}.
      */
-    default void render(Map<String, ?> model, HttpServerRequest request, HttpServletResponse.Builder builder) throws Exception {
-        HttpServletResponse response = builder.build();
-        render(model, request, response);
-        // The builder is consumed — implementations should use builder directly for efficiency
+    default boolean isStreaming() {
+        return false;
     }
 
     /**
-     * Render the view with HttpServerResponse (for internal Netty server use)
+     * Render the view into a buffered response builder.
+     * Used for non-streaming views.
      */
+    void render(Map<String, ?> model, HttpServerRequest request, HttpServletResponse.Builder builder) throws Exception;
+
+    /**
+     * Render the view as a streaming response.
+     * Default implementation falls back to buffered rendering.
+     * Streaming views must override this.
+     */
+    default void renderStreaming(Map<String, ?> model, HttpServerRequest request,
+                                  StreamingHttpServerResponse response) throws Exception {
+        // Default: render buffered then write all at once
+        HttpServletResponse.Builder builder = HttpServletResponse.builder();
+        render(model, request, builder);
+        HttpServletResponse built = builder.build();
+        response.status(built.getStatus());
+        response.getHeaders().addAll(built.getHeaders());
+        byte[] content = built.getContent();
+        if (content != null) {
+            response.getOutputStream().write(content);
+        }
+        response.complete();
+    }
+
+    /**
+     * @deprecated Use {@link #render(Map, HttpServerRequest, HttpServletResponse.Builder)} instead.
+     */
+    @Deprecated
+    default void render(Map<String, ?> model, HttpServerRequest request, HttpServletResponse response) throws Exception {
+        HttpServletResponse.Builder builder = HttpServletResponse.builder()
+                .status(response.getStatus())
+                .headers(response.getHeaders())
+                .content(response.getContent());
+        render(model, request, builder);
+    }
+
+    /**
+     * @deprecated Use builder-based or streaming render instead.
+     */
+    @Deprecated
     default void render(Map<String, ?> model, HttpServerRequest request, HttpServerResponse response) throws Exception {
         if (response != null) {
             render(model, request, response.toImmutable());
@@ -38,12 +79,7 @@ public interface View {
     }
 
     /**
-     * Render the view with HttpServletResponse (standard servlet-style response)
-     */
-    void render(Map<String, ?> model, HttpServerRequest request, HttpServletResponse response) throws Exception;
-
-    /**
-     * Abstract base implementation
+     * Abstract base for non-streaming views.
      */
     abstract class AbstractView implements View {
 
@@ -59,25 +95,13 @@ public interface View {
         }
 
         @Override
-        public void render(Map<String, ?> model, HttpServerRequest request, HttpServletResponse response) throws Exception {
-            if (response == null) {
-                throw new IllegalStateException("Response is required");
-            }
-            doRender(model, request, response);
+        public void render(Map<String, ?> model, HttpServerRequest request, HttpServletResponse.Builder builder)
+                throws Exception {
+            builder.contentType(getContentType());
+            doRender(model, request, builder);
         }
 
-        @Override
-        public void render(Map<String, ?> model, HttpServerRequest request, HttpServerResponse response) throws Exception {
-            if (response == null) {
-                throw new IllegalStateException("Response is required");
-            }
-            doRender(model, request, response.toImmutable());
-        }
-
-        protected abstract void doRender(Map<String, ?> model, HttpServerRequest request, HttpServletResponse response) throws Exception;
-
-        protected HttpServletResponse getResponse() {
-            return HttpServletResponse.ok();
-        }
+        protected abstract void doRender(Map<String, ?> model, HttpServerRequest request,
+                                          HttpServletResponse.Builder builder) throws Exception;
     }
 }

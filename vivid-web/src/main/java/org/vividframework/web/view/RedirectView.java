@@ -8,7 +8,7 @@ import org.vividframework.http.HttpServerRequest;
 import java.util.Map;
 
 /**
- * Redirect view
+ * Redirect view supporting 301/302/303 redirects with model-to-query propagation.
  * @author Jon Fisher
  */
 public class RedirectView extends View.AbstractView {
@@ -31,29 +31,24 @@ public class RedirectView extends View.AbstractView {
     }
 
     @Override
-    protected void doRender(Map<String, ?> model, HttpServerRequest request, HttpServletResponse response) throws Exception {
+    protected void doRender(Map<String, ?> model, HttpServerRequest request,
+                            HttpServletResponse.Builder builder) throws Exception {
         String targetUrl = createTargetUrl(model, request);
         targetUrl = appendQueryProperties(targetUrl, model);
 
-        if (http10Compatible) {
-            response.setStatus(HttpStatus.MOVED_PERMANENTLY);
-        } else {
-            response.setStatus(HttpStatus.SEE_OTHER);
-        }
-        response.setHeader(HttpHeaders.LOCATION, targetUrl);
-        response.setContent(("Redirecting to " + targetUrl).getBytes());
+        builder.status(http10Compatible ? HttpStatus.MOVED_PERMANENTLY : HttpStatus.SEE_OTHER)
+               .header(HttpHeaders.LOCATION, targetUrl)
+               .content("Redirecting to " + targetUrl);
     }
 
     protected String createTargetUrl(Map<String, ?> model, HttpServerRequest request) {
         String url = this.url;
         if (contextRelative && url.startsWith("/")) {
-            String contextPath = request.getPath();
-            if (contextPath != null && contextPath.length() > 1) {
-                int slashIndex = contextPath.indexOf("/", 1);
-                if (slashIndex > 0) {
-                    url = contextPath.substring(0, slashIndex) + url;
-                } else {
-                    url = contextPath + url;
+            String path = request.getPath();
+            if (path != null && path.length() > 1) {
+                int slashIdx = path.indexOf("/", 1);
+                if (slashIdx > 0) {
+                    url = path.substring(0, slashIdx) + url;
                 }
             }
         }
@@ -61,15 +56,14 @@ public class RedirectView extends View.AbstractView {
     }
 
     protected String appendQueryProperties(String targetUrl, Map<String, ?> model) {
-        if (!exposeModelAttributes) {
+        if (!exposeModelAttributes || model == null) {
             return targetUrl;
         }
-
         StringBuilder query = new StringBuilder();
         boolean first = true;
         for (Map.Entry<String, ?> entry : model.entrySet()) {
             String name = entry.getKey();
-            if (name.startsWith("org.springframework")) {
+            if (name.startsWith("org.vividframework")) {
                 continue;
             }
             Object value = entry.getValue();
@@ -83,35 +77,14 @@ public class RedirectView extends View.AbstractView {
                 query.append(name).append("=").append(value.toString());
             }
         }
-
         return targetUrl + query.toString();
     }
 
-    public String getUrl() {
-        return url;
-    }
-
-    public boolean isContextRelative() {
-        return contextRelative;
-    }
-
-    public void setContextRelative(boolean contextRelative) {
-        this.contextRelative = contextRelative;
-    }
-
-    public boolean isHttp10Compatible() {
-        return http10Compatible;
-    }
-
-    public void setHttp10Compatible(boolean http10Compatible) {
-        this.http10Compatible = http10Compatible;
-    }
-
-    public boolean isExposeModelAttributes() {
-        return exposeModelAttributes;
-    }
-
-    public void setExposeModelAttributes(boolean exposeModelAttributes) {
-        this.exposeModelAttributes = exposeModelAttributes;
-    }
+    public String getUrl() { return url; }
+    public boolean isContextRelative() { return contextRelative; }
+    public void setContextRelative(boolean contextRelative) { this.contextRelative = contextRelative; }
+    public boolean isHttp10Compatible() { return http10Compatible; }
+    public void setHttp10Compatible(boolean http10Compatible) { this.http10Compatible = http10Compatible; }
+    public boolean isExposeModelAttributes() { return exposeModelAttributes; }
+    public void setExposeModelAttributes(boolean exposeModelAttributes) { this.exposeModelAttributes = exposeModelAttributes; }
 }
