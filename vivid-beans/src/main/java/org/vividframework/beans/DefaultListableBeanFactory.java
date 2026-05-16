@@ -202,15 +202,82 @@ public class DefaultListableBeanFactory implements ListableBeanFactory, BeanDefi
             throw new IllegalStateException("Cannot determine bean class for " + beanName);
         }
 
-        Constructor<?> constructorToUse;
-        if (args != null && args.length > 0) {
-            constructorToUse = beanClass.getDeclaredConstructors()[0];
-        } else {
-            constructorToUse = beanClass.getDeclaredConstructors()[0];
+        // Check for pre-created instance
+        if (beanDefinition.getInstance() != null) {
+            return beanDefinition.getInstance();
         }
 
-        Object bean = constructorToUse.newInstance(args);
-        return bean;
+        Constructor<?> constructorToUse = findInjectableConstructor(beanClass);
+        Object[] resolvedArgs = resolveConstructorArguments(constructorToUse);
+
+        return constructorToUse.newInstance(resolvedArgs);
+    }
+
+    /**
+     * Find the constructor to use for injection.
+     * Priority: @Inject annotated > single constructor > no-arg constructor.
+     */
+    protected Constructor<?> findInjectableConstructor(Class<?> beanClass) {
+        Constructor<?>[] constructors = beanClass.getDeclaredConstructors();
+
+        // Single constructor: use it
+        if (constructors.length == 1) {
+            return constructors[0];
+        }
+
+        // Find @Inject annotated constructor
+        for (Constructor<?> c : constructors) {
+            if (c.isAnnotationPresent(org.vividframework.beans.annotation.Inject.class)
+                    || c.isAnnotationPresent(org.vividframework.beans.annotation.Autowired.class)) {
+                return c;
+            }
+        }
+
+        // Default: no-arg constructor
+        try {
+            return beanClass.getDeclaredConstructor();
+        } catch (NoSuchMethodException e) {
+            throw new IllegalStateException("No default constructor found for " + beanClass.getName()
+                    + ". Add @Inject to a constructor or provide a no-arg constructor.");
+        }
+    }
+
+    /**
+     * Resolve constructor arguments from the bean factory.
+     */
+    protected Object[] resolveConstructorArguments(Constructor<?> constructor) throws Exception {
+        java.lang.reflect.Parameter[] params = constructor.getParameters();
+        if (params.length == 0) return new Object[0];
+
+        Object[] args = new Object[params.length];
+        for (int i = 0; i < params.length; i++) {
+            java.lang.reflect.Parameter param = params[i];
+            String[] names = getBeanNamesForType(param.getType());
+            if (names.length == 1) {
+                args[i] = getBean(names[0], param.getType());
+            } else if (names.length > 1) {
+                // Try @Named qualifier
+                org.vividframework.beans.annotation.Named named =
+                        param.getAnnotation(org.vividframework.beans.annotation.Named.class);
+                if (named != null) {
+                    args[i] = getBean(named.value(), param.getType());
+                } else {
+                    throw new IllegalStateException("Ambiguous constructor parameter " + param.getType().getName()
+                            + " for " + constructor.getDeclaringClass().getName()
+                            + ". Found " + names.length + " beans: " + java.util.Arrays.toString(names)
+                            + ". Use @Named to disambiguate.");
+                }
+            } else if (!param.getType().isInterface()
+                    && !java.lang.reflect.Modifier.isAbstract(param.getType().getModifiers())) {
+                // Just-in-time binding for concrete types
+                String jitName = uncapitalize(param.getType().getSimpleName());
+                registerBeanDefinition(jitName, new RootBeanDefinition(param.getType()));
+                args[i] = getBean(jitName);
+            } else {
+                args[i] = null;
+            }
+        }
+        return args;
     }
 
     protected void initializeBean(Object bean, String beanName, RootBeanDefinition beanDefinition) throws Exception {
@@ -371,6 +438,27 @@ public class DefaultListableBeanFactory implements ListableBeanFactory, BeanDefi
 
     protected void clearSingletonCache(String beanName) {
         singletonObjects.remove(beanName);
+    }
+
+    // --- Fluent bean registration (Spring-style) ---
+
+    public <T> BeanRegistration.Builder<T> registerBean(Class<T> beanType) {
+        return BeanRegistration.forType(this, beanType);
+    }
+
+    public <T> BeanRegistration.Builder<T> registerBean(Class<T> beanType, Class<? extends T> implType) {
+        return BeanRegistration.forType(this, beanType, implType);
+    }
+
+    public <T> BeanRegistration.Builder<T> registerBean(String beanName, Class<T> beanType) {
+        return BeanRegistration.forType(this, beanType);
+    }
+
+    // --- Singleton cache ---
+
+    private static String uncapitalize(String s) {
+        if (s == null || s.isEmpty()) return s;
+        return Character.toLowerCase(s.charAt(0)) + s.substring(1);
     }
 
     public void clearSingletonCache() {

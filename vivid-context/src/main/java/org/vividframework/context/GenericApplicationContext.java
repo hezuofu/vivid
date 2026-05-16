@@ -2,6 +2,7 @@ package org.vividframework.context;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vividframework.beans.BeanConfigurer;
 import org.vividframework.beans.BeanDefinition;
 import org.vividframework.beans.BeanDefinitionRegistry;
 import org.vividframework.beans.BeanFactoryPostProcessor;
@@ -305,6 +306,9 @@ public class GenericApplicationContext implements ApplicationContext, BeanDefini
             // Step 4: Invoke factory processors
             invokeBeanFactoryProcessors(beanFactory);
 
+            // Step 4.5: Process BeanConfigurer registrations
+            invokeBeanConfigurers(beanFactory);
+
             // Step 5: Register bean post-processors
             registerBeanPostProcessors(beanFactory);
 
@@ -372,6 +376,24 @@ public class GenericApplicationContext implements ApplicationContext, BeanDefini
         }
 
         logger.debug("Invoked {} bean factory processors", processors.size());
+    }
+
+    protected void invokeBeanConfigurers(DefaultListableBeanFactory beanFactory) {
+        int count = 0;
+        for (String beanName : beanFactory.getBeanDefinitionNames()) {
+            try {
+                RootBeanDefinition bd = beanFactory.getBeanDefinition(beanName);
+                Class<?> beanClass = resolveBeanClass(bd);
+                if (beanClass != null && BeanConfigurer.class.isAssignableFrom(beanClass)) {
+                    BeanConfigurer configurer = (BeanConfigurer) beanClass.getDeclaredConstructor().newInstance();
+                    configurer.configure(beanFactory);
+                    count++;
+                }
+            } catch (Exception e) {
+                logger.debug("Skipping BeanConfigurer '{}': {}", beanName, e.getMessage());
+            }
+        }
+        logger.debug("Invoked {} bean configurers", count);
     }
 
     private Class<?> resolveBeanClass(RootBeanDefinition bd) {
