@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vividframework.util.Assert;
 
+import org.vividframework.beans.config.ConfigurationClassPostProcessor.BeanMethodFactoryBean;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -183,6 +185,13 @@ public class DefaultListableBeanFactory implements ListableBeanFactory, BeanDefi
             bean = applyBeanPostProcessorsBeforeInitialization(bean, beanName);
 
             initializeBean(bean, beanName, beanDefinition);
+
+            // FactoryBean support: replace with the factory's product
+            if (bean instanceof BeanMethodFactoryBean factoryBean) {
+                bean = factoryBean.createBean(this);
+            } else if (bean instanceof FactoryBean<?> factoryBean) {
+                bean = factoryBean.getObject();
+            }
 
             bean = applyBeanPostProcessorsAfterInitialization(bean, beanName);
 

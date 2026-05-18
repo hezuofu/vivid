@@ -18,6 +18,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -49,7 +50,10 @@ public class AutowiredAnnotationBeanPostProcessor implements BeanPostProcessor {
         
         // Inject fields
         injectFields(bean, clazz, metadata);
-        
+
+        // Inject @Value fields
+        injectValueFields(bean, clazz, metadata);
+
         // Inject methods
         injectMethods(bean, clazz, metadata);
         
@@ -89,18 +93,23 @@ public class AutowiredAnnotationBeanPostProcessor implements BeanPostProcessor {
         }
         metadata.constructor = autowiredConstructor;
         
-        // Find autowired fields
+        // Find autowired + @Value fields
         List<Field> autowiredFields = new ArrayList<>();
+        List<Field> valueFields = new ArrayList<>();
         Class<?> current = clazz;
         while (current != null && current != Object.class) {
             for (Field field : current.getDeclaredFields()) {
                 if (field.isAnnotationPresent(Autowired.class)) {
                     autowiredFields.add(field);
                 }
+                if (field.isAnnotationPresent(Value.class)) {
+                    valueFields.add(field);
+                }
             }
             current = current.getSuperclass();
         }
         metadata.fields = autowiredFields.toArray(new Field[0]);
+        metadata.valueFields = valueFields.toArray(new Field[0]);
         
         // Find autowired methods
         List<Method> autowiredMethods = new ArrayList<>();
@@ -256,34 +265,65 @@ public class AutowiredAnnotationBeanPostProcessor implements BeanPostProcessor {
             return resolveArrayDependency(componentType, required);
         }
         
-        // Handle Collection type
-        if (Collection.class.isAssignableFrom(type)) {
-            return null; // Collection resolution handled separately
+        // Handle Collection / List type
+        if (Collection.class.isAssignableFrom(type) || List.class.isAssignableFrom(type)) {
+            return resolveCollectionDependency(type, required);
         }
-        
-        // Handle Map type
+
+        // Handle Map<String, T> type
         if (Map.class.isAssignableFrom(type)) {
-            return null; // Map resolution handled separately
+            return resolveMapDependency(required);
         }
-        
-        // Try by type
-        try {
-            return beanFactory.getBean(type);
-        } catch (Exception e) {
-            // Try by name
+
+        // Try by type with @Primary disambiguation
+        String[] names = beanFactory.getBeanNamesForType(type);
+        if (names.length == 1) {
+            return beanFactory.getBean(names[0]);
+        }
+        if (names.length > 1) {
             if (name != null) {
+                try { return beanFactory.getBean(name); } catch (Exception ignored) {}
+            }
+            for (String n : names) {
                 try {
-                    return beanFactory.getBean(name);
-                } catch (Exception ignored) {
-                }
+                    Class<?> bc = beanFactory.getType(n);
+                    if (bc != null && bc.isAnnotationPresent(
+                            org.vividframework.beans.annotation.Primary.class)) {
+                        return beanFactory.getBean(n);
+                    }
+                } catch (Exception ignored) {}
             }
             if (required) {
                 throw new IllegalStateException(
-                    "No qualifying bean of type '" + type.getName() + "' found for dependency" +
-                    (name != null ? ": bean name '" + name + "'" : ""));
+                    "No qualifying bean of type '" + type.getName() + "' found: " + names.length
+                    + " beans: " + java.util.Arrays.toString(names)
+                    + ". Use @Primary or @Named to disambiguate.");
             }
+            return null;
+        }
+        if (required) {
+            throw new IllegalStateException(
+                "No qualifying bean of type '" + type.getName() + "' found for dependency");
         }
         return null;
+    }
+
+    private Object resolveCollectionDependency(Class<?> type, boolean required) throws Exception {
+        String[] allNames = ((org.vividframework.beans.ListableBeanFactory) beanFactory).getBeanDefinitionNames();
+        List<Object> beans = new ArrayList<>();
+        for (String n : allNames) {
+            try { beans.add(beanFactory.getBean(n)); } catch (Exception ignored) {}
+        }
+        return beans;
+    }
+
+    private Object resolveMapDependency(boolean required) throws Exception {
+        String[] allNames = ((org.vividframework.beans.ListableBeanFactory) beanFactory).getBeanDefinitionNames();
+        Map<String, Object> beans = new LinkedHashMap<>();
+        for (String n : allNames) {
+            try { beans.put(n, beanFactory.getBean(n)); } catch (Exception ignored) {}
+        }
+        return beans;
     }
 
     private Object resolveArrayDependency(Class<?> componentType, boolean required) throws Exception {
@@ -301,9 +341,55 @@ public class AutowiredAnnotationBeanPostProcessor implements BeanPostProcessor {
         return array;
     }
 
+    private void injectValueFields(Object bean, Class<?> clazz, AnnotationMetadata metadata) throws Exception {
+        for (Field field : metadata.valueFields) {
+            Value value = field.getAnnotation(Value.class);
+            String expression = value.value();
+            String resolved = resolveValue(expression);
+            field.setAccessible(true);
+            Object converted = convertValue(resolved, field.getType());
+            field.set(bean, converted);
+        }
+    }
+
+    private String resolveValue(String expression) {
+        // Support ${property.name} syntax
+        if (expression.startsWith("${") && expression.endsWith("}")) {
+            String key = expression.substring(2, expression.length() - 1);
+            // Try to get from bean factory's environment
+            if (beanFactory instanceof DefaultListableBeanFactory) {
+                // Walk up to find environment
+            }
+            // For now, resolve from system properties
+            String value = System.getProperty(key);
+            if (value != null) return value;
+            value = System.getenv(key.replace('.', '_'));
+            if (value != null) return value;
+            // Default: after colon (${key:default})
+            int colonIdx = key.indexOf(':');
+            if (colonIdx >= 0) {
+                return key.substring(colonIdx + 1);
+            }
+            return "";
+        }
+        return expression;
+    }
+
+    private Object convertValue(String value, Class<?> targetType) {
+        if (value == null) return null;
+        if (targetType == String.class) return value;
+        if (targetType == int.class || targetType == Integer.class) return Integer.parseInt(value);
+        if (targetType == long.class || targetType == Long.class) return Long.parseLong(value);
+        if (targetType == double.class || targetType == Double.class) return Double.parseDouble(value);
+        if (targetType == boolean.class || targetType == Boolean.class) return Boolean.parseBoolean(value);
+        if (targetType == float.class || targetType == Float.class) return Float.parseFloat(value);
+        return value;
+    }
+
     private static class AnnotationMetadata {
         Constructor<?> constructor;
         Field[] fields = new Field[0];
+        Field[] valueFields = new Field[0];
         Method[] methods = new Method[0];
     }
 }

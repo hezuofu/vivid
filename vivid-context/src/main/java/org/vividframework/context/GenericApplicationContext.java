@@ -64,6 +64,12 @@ public class GenericApplicationContext implements ApplicationContext, BeanDefini
         AutowiredAnnotationBeanPostProcessor processor = new AutowiredAnnotationBeanPostProcessor();
         processor.setBeanFactory(beanFactory);
         beanFactory.addBeanPostProcessor(processor);
+
+        // Register ConfigurationClassPostProcessor as a bean definition
+        // (it will be auto-discovered by invokeBeanFactoryProcessors)
+        RootBeanDefinition configProcessorDef = new RootBeanDefinition(
+                org.vividframework.beans.config.ConfigurationClassPostProcessor.class);
+        beanFactory.registerBeanDefinition("configurationClassPostProcessor", configProcessorDef);
     }
 
     private String generateId() {
