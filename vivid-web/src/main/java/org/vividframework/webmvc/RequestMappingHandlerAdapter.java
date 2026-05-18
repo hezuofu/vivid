@@ -37,6 +37,7 @@ public class RequestMappingHandlerAdapter implements HandlerAdapter {
         resolvers.addResolvers(
             new PathVariableMethodArgumentResolver(),
             new RequestBodyMethodArgumentResolver(),
+            new MultipartFileMethodArgumentResolver(),
             new RequestParamMethodArgumentResolver(),
             new RequestHeaderMethodArgumentResolver()
         );
