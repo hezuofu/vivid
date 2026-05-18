@@ -5,7 +5,8 @@
       "Bash(sed -n '54,59p' \"E:/ai-work/play4j/vivid-beans/src/main/java/org/vividframework/beans/config/ConfigurationClassPostProcessor.java\")",
       "Bash(sed -n '309,323p' \"E:/ai-work/play4j/vivid-beans/src/main/java/org/vividframework/beans/config/AutowiredAnnotationBeanPostProcessor.java\")",
       "Bash(git add *)",
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "Bash(git rm *)"
     ]
   }
 }

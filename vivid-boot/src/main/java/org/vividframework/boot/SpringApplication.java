@@ -10,6 +10,7 @@ import org.vividframework.beans.scanner.ClassPathBeanDefinitionScanner;
 import org.vividframework.context.GenericApplicationContext;
 import org.vividframework.web.DispatcherHandler;
 import org.vividframework.web.RequestMappingHandlerMapping;
+import org.vividframework.web.StaticResourceHandler;
 import org.vividframework.web.event.WebEventPublisher;
 import org.vividframework.web.filter.Filter;
 import org.vividframework.web.handler.ExceptionHandler;
@@ -292,6 +293,11 @@ public class SpringApplication {
         };
         context.registerBeanDefinition("xmlViewResolver",
                 createBeanDefinition(ViewResolver.class, xmlViewResolver));
+
+        // Static resource handler (lowest priority, checked after controllers)
+        StaticResourceHandler staticHandler = new StaticResourceHandler("/static/**", "static/");
+        context.registerBeanDefinition("staticResourceHandler",
+                createBeanDefinition(StaticResourceHandler.class, staticHandler));
 
         // Template file resolver (falls through for non-prefixed names)
         TemplateViewResolver templateResolver = new TemplateViewResolver(templatePath, ".html");

@@ -19,6 +19,13 @@ public interface HandlerMapping {
     HandlerExecutionChain getHandler(HttpServerRequest request) throws Exception;
 
     /**
+     * Priority order for this mapping (lower = higher priority).
+     */
+    default int getOrder() {
+        return 0;
+    }
+
+    /**
      * Get the mapping comparator for ordering
      */
     default Comparator<RequestMappingInfo> getMappingComparator() {
