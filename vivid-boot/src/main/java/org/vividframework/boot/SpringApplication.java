@@ -21,6 +21,7 @@ import org.vividframework.webmvc.RequestMappingHandlerAdapter;
 import org.vividframework.webmvc.ResponseBodyAdvice;
 import org.vividframework.server.netty.NettyHttpServer;
 import org.vividframework.server.AbstractHttpServer;
+import org.vividframework.web.resolver.ContentNegotiatingViewResolver;
 import org.vividframework.web.resolver.TemplateViewResolver;
 import org.vividframework.web.resolver.ViewResolver;
 import org.vividframework.web.view.HtmlView;
@@ -298,6 +299,11 @@ public class SpringApplication {
         StaticResourceHandler staticHandler = new StaticResourceHandler("/static/**", "static/");
         context.registerBeanDefinition("staticResourceHandler",
                 createBeanDefinition(StaticResourceHandler.class, staticHandler));
+
+        // Content negotiation (Accept header + .suffix + ?format=)
+        ContentNegotiatingViewResolver negotiatingResolver = new ContentNegotiatingViewResolver();
+        context.registerBeanDefinition("contentNegotiatingViewResolver",
+                createBeanDefinition(ContentNegotiatingViewResolver.class, negotiatingResolver));
 
         // Template file resolver (falls through for non-prefixed names)
         TemplateViewResolver templateResolver = new TemplateViewResolver(templatePath, ".html");
