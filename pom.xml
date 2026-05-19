@@ -19,6 +19,7 @@
         <module>vivid-beans</module>
         <module>vivid-context</module>
         <module>vivid-aop</module>
+        <module>vivid-servlet</module>
         <module>vivid-web</module>
         <module>vivid-boot</module>
         <module>vivid-jdbc</module>
@@ -133,6 +134,11 @@
                 <groupId>io.netty</groupId>
                 <artifactId>netty-all</artifactId>
                 <version>${netty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.servlet</groupId>
+                <artifactId>jakarta.servlet-api</artifactId>
+                <version>6.0.0</version>
             </dependency>
 
             <!-- Hibernate -->

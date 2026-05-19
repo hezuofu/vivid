@@ -6,7 +6,9 @@
       "Bash(sed -n '309,323p' \"E:/ai-work/play4j/vivid-beans/src/main/java/org/vividframework/beans/config/AutowiredAnnotationBeanPostProcessor.java\")",
       "Bash(git add *)",
       "Bash(git commit -m ' *)",
-      "Bash(git rm *)"
+      "Bash(git rm *)",
+      "Bash(sed -i 's/    @Override public void log\\(Exception e, String msg\\)/    public void log\\(Exception e, String msg\\)/' vivid-servlet/src/main/java/org/vividframework/servlet/VividServletContext.java)",
+      "Bash(sed -i 's/return request.getLocalAddress\\(\\);/return request.getLocalAddress\\(\\).getHostString\\(\\);/' vivid-servlet/src/main/java/org/vividframework/servlet/VividHttpServletRequest.java)"
     ]
   }
 }

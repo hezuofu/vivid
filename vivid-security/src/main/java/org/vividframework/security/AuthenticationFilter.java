@@ -49,7 +49,18 @@ public class AuthenticationFilter implements org.vividframework.web.filter.Filte
     }
 
     protected Authentication attemptAuthentication(HttpServerRequest request) throws Exception {
-        // Override in subclasses
+        // Try Basic Auth header
+        String authHeader = request.getHeader(org.vividframework.http.HttpHeaders.AUTHORIZATION);
+        if (authHeader != null && authHeader.startsWith("Basic ")) {
+            String base64 = authHeader.substring(6);
+            String decoded = new String(java.util.Base64.getDecoder().decode(base64));
+            String[] parts = decoded.split(":", 2);
+            if (parts.length == 2) {
+                UsernamePasswordAuthenticationToken token =
+                        new UsernamePasswordAuthenticationToken(parts[0], parts[1]);
+                return authenticationManager.authenticate(token);
+            }
+        }
         return null;
     }
 
