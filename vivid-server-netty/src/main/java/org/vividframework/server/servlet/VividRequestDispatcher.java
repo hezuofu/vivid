@@ -1,4 +1,4 @@
-package org.vividframework.servlet;
+package org.vividframework.server.servlet;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;

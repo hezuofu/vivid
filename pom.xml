@@ -19,7 +19,6 @@
         <module>vivid-beans</module>
         <module>vivid-context</module>
         <module>vivid-aop</module>
-        <module>vivid-servlet</module>
         <module>vivid-web</module>
         <module>vivid-boot</module>
         <module>vivid-jdbc</module>

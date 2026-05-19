@@ -8,7 +8,15 @@
       "Bash(git commit -m ' *)",
       "Bash(git rm *)",
       "Bash(sed -i 's/    @Override public void log\\(Exception e, String msg\\)/    public void log\\(Exception e, String msg\\)/' vivid-servlet/src/main/java/org/vividframework/servlet/VividServletContext.java)",
-      "Bash(sed -i 's/return request.getLocalAddress\\(\\);/return request.getLocalAddress\\(\\).getHostString\\(\\);/' vivid-servlet/src/main/java/org/vividframework/servlet/VividHttpServletRequest.java)"
+      "Bash(sed -i 's/return request.getLocalAddress\\(\\);/return request.getLocalAddress\\(\\).getHostString\\(\\);/' vivid-servlet/src/main/java/org/vividframework/servlet/VividHttpServletRequest.java)",
+      "Bash(sed -i 's/import org.vividframework.context.GenericApplicationContext;//' vivid-server-netty/src/main/java/org/vividframework/server/servlet/VividServletContext.java)",
+      "Bash(sed -i 's/private final GenericApplicationContext applicationContext;/private Object applicationContext;/' vivid-server-netty/src/main/java/org/vividframework/server/servlet/VividServletContext.java)",
+      "Bash(sed -i 's/public VividServletContext\\(GenericApplicationContext applicationContext\\)/public VividServletContext\\(Object applicationContext\\)/' vivid-server-netty/src/main/java/org/vividframework/server/servlet/VividServletContext.java)",
+      "Bash(sed -i 's/public GenericApplicationContext getApplicationContext\\(\\)/public Object getApplicationContext\\(\\)/' vivid-server-netty/src/main/java/org/vividframework/server/servlet/VividServletContext.java)",
+      "Bash(sed -i 's/GenericApplicationContext applicationContext/Object applicationContext/' vivid-server-netty/src/main/java/org/vividframework/server/servlet/VividServletContext.java)",
+      "Bash(head -98 vivid-server-netty/src/main/java/org/vividframework/server/servlet/VividHttpSession.java)",
+      "Bash(echo \"}\")",
+      "Bash(mv /tmp/vs.java vivid-server-netty/src/main/java/org/vividframework/server/servlet/VividHttpSession.java)"
     ]
   }
 }

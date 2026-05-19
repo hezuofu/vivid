@@ -1,8 +1,7 @@
-package org.vividframework.servlet;
+package org.vividframework.server.servlet;
 
 import jakarta.servlet.*;
 import jakarta.servlet.descriptor.JspConfigDescriptor;
-import org.vividframework.context.GenericApplicationContext;
 
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -15,16 +14,13 @@ import java.util.*;
  */
 public class VividServletContext implements ServletContext {
 
-    private final GenericApplicationContext applicationContext;
     private final Map<String, Object> attributes = new HashMap<>();
     private final Map<String, String> initParams = new HashMap<>();
     private String contextPath = "";
     private int majorVersion = 6;
     private int minorVersion = 0;
 
-    public VividServletContext(GenericApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
-    }
+    public VividServletContext() {}
 
     @Override public String getContextPath() { return contextPath; }
     public void setContextPath(String p) { contextPath = p; }
@@ -33,9 +29,7 @@ public class VividServletContext implements ServletContext {
     @Override public int getMinorVersion() { return minorVersion; }
     @Override public int getEffectiveMajorVersion() { return majorVersion; }
     @Override public int getEffectiveMinorVersion() { return minorVersion; }
-    @Override public String getMimeType(String file) {
-        return org.vividframework.web.StaticResourceHandler.getContentType(file);
-    }
+    @Override public String getMimeType(String file) { return "application/octet-stream"; }
     @Override public Set<String> getResourcePaths(String path) { return Set.of(); }
     @Override public URL getResource(String path) throws MalformedURLException {
         return Thread.currentThread().getContextClassLoader().getResource(path);
@@ -47,7 +41,7 @@ public class VividServletContext implements ServletContext {
         return new VividRequestDispatcher(path, this);
     }
     @Override public RequestDispatcher getNamedDispatcher(String name) { return null; }
-    @Override public String getServletContextName() { return "Vivid Servlet"; }
+    @Override public String getServletContextName() { return "Vivid Servlet Container"; }
     @Override public String getServerInfo() { return "Vivid/1.0"; }
 
     @Override public void setAttribute(String name, Object o) { attributes.put(name, o); }
@@ -57,17 +51,14 @@ public class VividServletContext implements ServletContext {
 
     @Override public String getInitParameter(String name) { return initParams.get(name); }
     @Override public Enumeration<String> getInitParameterNames() { return Collections.enumeration(initParams.keySet()); }
-    @Override public boolean setInitParameter(String name, String value) {
-        initParams.put(name, value); return true;
-    }
+    @Override public boolean setInitParameter(String name, String value) { initParams.put(name, value); return true; }
 
-    @Override public void log(String msg) { System.getLogger("vivid.servlet").log(System.Logger.Level.INFO, msg); }
-    public void log(Exception e, String msg) { log(msg + ": " + e); }
+    @Override public void log(String msg) { System.getLogger("vivid").log(System.Logger.Level.INFO, msg); }
     @Override public void log(String msg, Throwable t) { log(msg + ": " + t); }
 
     @Override public String getRealPath(String path) { return null; }
 
-    // --- Unsupported / no-op ---
+    // --- No-op registrations ---
     @Override public ServletRegistration.Dynamic addServlet(String n, String c) { return null; }
     @Override public ServletRegistration.Dynamic addServlet(String n, Servlet s) { return null; }
     @Override public ServletRegistration.Dynamic addServlet(String n, Class<? extends Servlet> c) { return null; }
@@ -99,6 +90,4 @@ public class VividServletContext implements ServletContext {
     @Override public void setRequestCharacterEncoding(String enc) {}
     @Override public String getResponseCharacterEncoding() { return "UTF-8"; }
     @Override public void setResponseCharacterEncoding(String enc) {}
-
-    public GenericApplicationContext getApplicationContext() { return applicationContext; }
 }
